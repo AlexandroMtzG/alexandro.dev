@@ -3,6 +3,7 @@ import bradlcAvatar from './img/bradlc.jpg'
 import steveschogerAvatar from './img/steveschoger.jpg'
 import robinmalfaitAvatar from './img/robinmalfait.jpg'
 import simonswissAvatar from './img/simonswiss.jpg'
+import alexandromtzgAvatar from './img/alexandromtzg.jpg'
 
 export const adamwathan = {
   name: 'Adam Wathan',
@@ -32,4 +33,10 @@ export const simonswiss = {
   name: 'Simon Vrachliotis',
   twitter: '@simonswiss',
   avatar: simonswissAvatar,
+}
+
+export const alexandromtzg = {
+  name: 'Alexandro Martinez',
+  twitter: '@alexandromtzg',
+  avatar: alexandromtzgAvatar,
 }

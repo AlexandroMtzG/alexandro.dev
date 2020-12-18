@@ -31,12 +31,12 @@ export default function Post({ meta, children, posts }) {
         <meta name="twitter:creator" content="@tailwindcss" />
         <meta name="twitter:title" content={`${meta.title} – Tailwind CSS`} />
         <meta name="twitter:description" content={meta.description} />
-        <meta name="twitter:image" content={`https://blog.tailwindcss.com${meta.image}`} />
-        <meta property="og:url" content={`https://blog.tailwindcss.com${router.pathname}`} />
+        <meta name="twitter:image" content={`https://alexandro.dev${meta.image}`} />
+        <meta property="og:url" content={`https://alexandro.dev${router.pathname}`} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={`${meta.title} – Tailwind CSS`} />
         <meta property="og:description" content={meta.description} />
-        <meta property="og:image" content={`https://blog.tailwindcss.com${meta.image}`} />
+        <meta property="og:image" content={`https://alexandro.dev${meta.image}`} />
         <meta name="description" content={meta.description}></meta>
       </Head>
       <header className="pt-6 xl:pb-10">

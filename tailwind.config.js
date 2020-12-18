@@ -74,6 +74,7 @@ module.exports = {
             },
             a: {
               color: theme('colors.gray.900'),
+              textDecoration: "underline",
             },
             pre: {
               color: theme('colors.gray.200'),

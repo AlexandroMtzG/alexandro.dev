@@ -13,25 +13,32 @@ export default function Home() {
     <div className="divide-y divide-gray-200">
       <Head>
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@tailwindcss" />
-        <meta name="twitter:creator" content="@tailwindcss" />
-        <meta name="twitter:title" content="Blog – Tailwind CSS" />
+        <meta name="twitter:site" content="@alexandromtzg" />
+        <meta name="twitter:creator" content="@alexandromtzg" />
+        <meta name="twitter:title" content="Blog – alexandro.dev" />
         <meta name="twitter:description" content="News content from the Tailwind CSS team." />
-        <meta name="twitter:image" content={`https://blog.tailwindcss.com${twitterCard}`} />
-        <meta property="og:url" content="https://blog.tailwindcss.com" />
+        <meta name="twitter:image" content={`https://alexandro.dev${twitterCard}`} />
+        <meta property="og:url" content="https://alexandro.dev" />
         <meta property="og:type" content="article" />
         <meta property="og:title" content="Blog – Tailwind CSS" />
         <meta property="og:description" content="News content from the Tailwind CSS team." />
-        <meta property="og:image" content={`https://blog.tailwindcss.com${twitterCard}`} />
+        <meta property="og:image" content={`https://alexandro.dev${twitterCard}`} />
         <title>Blog – Tailwind CSS</title>
         <meta name="description" content="News content from the Tailwind CSS team." />
       </Head>
       <div className="pt-6 pb-8 space-y-2 md:space-y-5">
-        <h1 className="text-3xl leading-9 font-extrabold text-gray-900 tracking-tight sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-          Latest
-        </h1>
+        {/* <h1 className="text-3xl leading-9 font-extrabold text-gray-900 tracking-tight sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
+          alexandro.dev
+        </h1> */}
         <p className="text-lg leading-7 text-gray-500">
-          All the latest Tailwind CSS news, straight from the team.
+          I'm <a href="https://twitter.com/alexandromtzg" className="underline text-violet-600">@alexandromtzg</a>, full-stack developer, I have great admiration for the tailwind team, so I'm focused on building a better design for  <a className="underline" href="https://netcoresaas.com"
+          target="_blank">netcoresaas.com</a>.
+        </p>
+        <p className="text-lg leading-7 text-gray-500">
+          My favorite tools are .NET, Vue, TailwindCSS, PostgreSQL, Heroku and AWS LightSail.
+        </p>
+        <p className="text-lg leading-7 text-gray-500">
+          Expect post related to those technologies and other stuff.
         </p>
       </div>
       <ul className="divide-y divide-gray-200">
