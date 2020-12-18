@@ -26,7 +26,7 @@ export default function Header() {
         </Link>
       </div> 
        <div className="text-base leading-5">
-        <a href="https://twitter.com/alexandromtzg" className="font-medium text-gray-500 hover:text-gray-700">
+        <a target="_blank" href="https://twitter.com/alexandromtzg" className="font-medium text-gray-500 hover:text-gray-700">
           Follow me &rarr;
         </a>
       </div>

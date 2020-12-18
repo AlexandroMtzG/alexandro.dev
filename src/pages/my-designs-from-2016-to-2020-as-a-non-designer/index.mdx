@@ -1,0 +1,112 @@
+import { alexandromtzg } from '@/authors'
+import image from './cardDark.png'
+import img4gl from './4gl.png'
+import img1 from './1.png'
+import img2 from './2.png'
+import img3 from './3.png'
+import img4 from './4.png'
+import img5 from './5.png'
+import img6 from './6.png'
+import img7 from './7.png'
+import img8 from './8.png'
+import img9 from './9.png'
+import imgWeb from './web.png'
+
+export const meta = {
+  title: 'My designs from 2016 to 2020 as a non-designer',
+  description: `I've been a developer for almost 9 years, I always found desgin to be tedious work. These are my application designs since 2016.`,
+  date: '2020-12-18T12:05:00Z',
+  authors: [alexandromtzg],
+  image,
+  discussion: 'http://eepurl.com/hl-Lkj',
+}
+
+I've been a developer for almost 9 years, I always found desgin to be tedious work. These are my application designs since 2016.
+
+From Winforms with dragged text boxes without proper design to functional Vue + TailwindCSS components.
+
+<!--more-->
+
+## 2016 - Migration from 4GL to Winforms
+
+My dad has this legacy application written on 4GL that looks like this:
+
+<img src={img4gl} alt="4GL application" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+I was still in college when we decided to migrate every .4gl program to Desktop Winforms with C#. It was a bad decision, I know, we should've gone with the Web route. 
+
+The first concept of my Winforms looked like this:
+
+<span className="font-bold">
+Absys ERP v0.0.1
+</span>
+<img src={img1} alt="Absys ERP v0.0.1" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+I know, ugly as hell.
+
+At least we knew the migration wouldn't be as difficult as we thought it'd be.
+
+## 2017 - Improving the desktop app home screen
+
+We tested a few home screens before we were satisfied with the migration, about 450 forms.
+
+<h4>Absys ERP v1.0.0</h4>
+<p>Program-based sidebar and a few links of most used programs/features.</p>
+<img src={img2} alt="Absys ERP v1.0.0" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+<h4>Absys ERP v1.5.0</h4>
+<p>Module-based sidebar and section details of selected module.</p>
+<img src={img3} alt="Absys ERP v1.5.0" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+## 2018 - Adding business intelligence dashboards
+
+<h4>Absys ERP v2019.5.0</h4>
+<p>Role-based instead and I added a business intelligence dashboard.</p>
+<img src={img4} alt="Absys ERP v1.5.0" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+This is the desktop design that stayed.
+
+## 2019 - My first attempt to design on the web
+
+We had a few clients requesting the ability to place orders on their phones, so I prepare myself for web development.
+
+I used [VueJS](https://vuejs.org/) and [Bootstrap Vue](https://bootstrap-vue.org/) to create a simpler version of the ERP we built on desktop.
+
+I came up with this bubbled and opaque design.
+
+<h4>Absys ERP (Web) v1.0.0</h4>
+<p>Only for certain roles such as CEO, Supplier, Seller and Customer</p>
+<img src={imgWeb} alt="Absys ERP v1.5.0" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+I had to look for something else, although I loved Vue ❤️.
+
+## 2020 - TailwindCSS to the rescue
+
+Since COVID started, I decided to start working on side projects. This SaaS idea came to mind and I wanted to develop it as quickly as possible.
+
+I realized I had to find a better tool, a more atomic design framework/library.
+So before I even wrote a single line of code I bought [TailwindUI](https://tailwindui.com), copy-pasted a lot of their samples, and modified some bits.
+
+Then I started working on a project called NetcoreSaas, a boilerplate for SaaS development with .NET, Vue, and Tailwind.
+
+After I implemented all features for authentication, multi-tenant, multi-language, multi-theme, multi-database... this was the final design.
+
+<h4>NetcoreSaas</h4>
+<p>Landing page (marketing side)</p>
+<img src={img6} alt="NetcoreSaas - Landing page (marketing side)" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+<h4>NetcoreSaas</h4>
+<p>Organization settings page (app side)</p>
+<img src={img7} alt="NetcoreSaas - Organization settings page (app side)" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+## Conclusion
+
+It's clear to me that I can rely on the Tailwind team so I won't ever be alone as I felt with Winforms. I never wanted to go the WPF route I don't know why.
+
+I will still be maintaining the current Winforms ERP, and developing some features here and there, but I'm going to slowly create SaaS applications with this stack.
+
+<h4>My winforms app design</h4>
+<img src={img9} alt="My Winforms app" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+
+<h4>My future 2021+ SaaS app design</h4>
+<img src={img8} alt="My future SaaS apps" className="border-3 border-gray-900 rounded-md w-full shadow-md" />
+

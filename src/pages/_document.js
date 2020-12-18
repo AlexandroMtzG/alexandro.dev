@@ -44,9 +44,11 @@ export default class Document extends NextDocument {
             crossOrigin="true"
           />
         </InlineStylesHead>
-        <body>
+        <body >
           <Main />
           <NextScript />
+          <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+          <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt=""/></noscript>
         </body>
       </Html>
     )
