@@ -2,7 +2,7 @@ import tinytime from 'tinytime'
 import Link from 'next/link'
 import Head from 'next/head'
 import getAllPostPreviews from '@/getAllPostPreviews'
-import twitterCard from '@/img/twitter-card.jpg'
+import twitterCard from '@/img/twitter-card.png'
 
 const posts = getAllPostPreviews()
 
