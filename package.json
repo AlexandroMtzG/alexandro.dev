@@ -5,7 +5,7 @@
   "scripts": {
     "prestart": "postcss src/css/tailwind.css -o src/css/out.css",
     "dev": "postcss src/css/tailwind.css -o src/css/out.css && next dev",
-    "build": "postcss src/css/tailwind.css -o src/css/out.css && next build && next export",
+    "build": "next build && next export",
     "start": "next start",
     "build:rss": "node ./.next/server/scripts/build-rss.js"
   },
