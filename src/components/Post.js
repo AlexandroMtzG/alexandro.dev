@@ -25,7 +25,7 @@ export default function Post({ meta, children, posts }) {
   return (
     <article className="xl:divide-y xl:divide-gray-200">
       <Head>
-        <title>{meta.title} – Tailwind CSS</title>
+        <title>{meta.title} – alexandro.dev</title>
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@alexandromtzg" />
