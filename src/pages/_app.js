@@ -1,4 +1,4 @@
-import '@/css/tailwind.css'
+import '@/css/out.css'
 import Head from 'next/head'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
