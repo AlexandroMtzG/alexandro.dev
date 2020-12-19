@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import icon from '../img/icon.png'
-import logo from '../img/logo3.png'
+import logo from '../img/logo.png'
 
 
 function TailwindMark({ className }) {
