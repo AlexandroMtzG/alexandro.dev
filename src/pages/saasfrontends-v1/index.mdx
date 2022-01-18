@@ -1,0 +1,435 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'SaasFrontends v1.0',
+  category: 'Article',
+  description: `Today I'm finally releasing SaasFrontends v1.0, a SaaS template in Vue2, Vue3, React and Svelte, using Tailwind CSS as CSS Framework and .NET as the backend.`,
+  date: '2022-01-16T16:43:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+In 2020, I released my first boilerplate for building SaaS applications, <a href="https://netcoresaas.com" target="_blank">netcoresaas.com</a>. It included a <strong>Vue2</strong> frontend with a <strong>.NET</strong> backend.
+
+Not until 1 year later, I was able to migrate from Vue2 to <strong>Vue3</strong>, Vue3 to <strong>React</strong> and React to <strong>Svelte</strong>.
+
+Introducing SaasFrontends v1.0.
+
+<!--more-->
+
+<img src={image} alt="SaasFrontends v1.0" />
+
+As they say, _If it were easy, everyone would do it_.
+
+## Challenges:
+
+1.  Creating the <b className="border-b border-theme-400">Boilerplate</b>
+2.  Migrating Vue2 to <b className="border-b border-theme-400">Vue3</b>
+3.  Migrating Vue3 to <b className="border-b border-theme-400">React</b>
+4.  Migrating React to <b className="border-b border-theme-400">Svelte</b>
+5.  Creating the <b className="border-b border-theme-400">Documentation</b>
+6.  Creating free UI <b className="border-b border-theme-400">Components</b>
+7.  Creating the <b className="border-b border-theme-400">Editions</b>
+8.  Publishing <b className="border-b border-theme-400">Demos</b>
+9.  Publishing <b className="border-b border-theme-400">Codebases</b>
+10. Publishing on <b className="border-b border-theme-400">Gumroad</b>
+11. Creating the <b className="border-b border-theme-400">Blog</b>
+
+## 1. Creating the boilerplate
+
+Back in 2020, I had just finished a project which consisted in migrating a 4GL to a desktop .NET application. I decided it was time to move it to the web, but I had zero knowledge in JavaScript and CSS.
+
+I figured it would be nice to migrate my Desktop App to the Web with the mindset of making it a boilerplate for other devs like me. That led me into testing JavaScript frameworks and when I tried out Vue (v2), I immediately loved it.
+
+I was thinking of using **Bootstrap**, since it has most common UI components, but I read about **Tailwind CSS**, and it honestly changed the whole picture for me, I never liked raw **CSS**. I bought Tailwind UI Marketing + Application package ([you should get it](https://tailwindui.com/pricing)), and started to learn with it.
+
+They don't have **Vue2 components** so it was a bit of a challenge when I tried to use functional components.
+
+It took me 3 months of development + 3 months of marketing, and the end product was [netcoresaas.com](https://netcoresaas.com), my first web product.
+
+[You can read more about this here](https://alexandro.dev/my-designs-from-2016-to-2020-as-a-non-designer).
+
+## 2. Migrating Vue2 to Vue3
+
+I got a about 20 requests of the updated Vue version, and back in January 2021, I created a branch to try to migrate vue2 to vue3 as fast as possible, but I failed.
+
+I knew I had to rewrite all of the components by hand (with the help of Find and Replace of course).
+
+Before I started migrating, I decided to use [Vite](https://vitejs.dev/), since it was also created by [Evan You](https://twitter.com/youyuxi) the creator of Vue, and because Vite supports React and Svelte.
+
+### 2.1. Component Definition
+
+In Vue2, if you want **TypeScript** support, you need to make your components as Class Components:
+
+```js SampleVue2.vue
+<template>
+  ...
+</template>
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+@Component({...})
+export default class SampleComponent extends Vue {
+  counter: number = 0;
+  mounted() { ... }
+  ...
+}
+```
+
+In order to convert them to **Vue3** learned that the best way was to use the new [**Script Setup**](https://v3.vuejs.org/api/sfc-script-setup.html) sintax:
+
+```html SampleVue3.vue
+<template> ... </template>
+<script setup lang="ts">
+  import { onMounted } from 'vue';
+  const counter = ref<Number>(0);
+  onMounted(() => { ... })
+  ...
+</script>
+```
+
+### 2.2. Reactive Variables
+
+Vue3 reactive variable syntax makes more sense to me, since you always know when updating the value using the `.value` property. And also inside the `<template>`, Vue3 knows which variables are reactive.
+
+```tsx
+// <template> ...
+  <div>Counter: {{ counter }}</div>
+// <script> ...
+...
+const counter = ref(0);
+function increment(i: number) {
+  counter.value += i;
+}
+```
+
+### 2.3. Computed Functions
+
+In Vue2 you need to put your computed functions inside `computed:`, or if your using TypeScript with a `getter` propery:
+
+```tsx
+get fullName() {
+  return firstName + ' ' + lastName;
+}
+```
+
+There's no need for that in Vue3, since functions know when they're using a reactive variable:
+
+```tsx
+const firstName = ref<string>("Alex");
+const lastName = ref<string>("Martinez");
+fullName() {
+  return firstName + ' ' + lastName;
+}
+```
+
+### 2.4. Template Refs
+
+When you want to call a function inside a child component, and have the TypeScript autocompletion, you do it this way:
+
+```jsx
+// Template
+<LoadingButton ref="loadingButton" @click="start()">Loading</LoadingButton>
+// Script
+$refs!: {
+  loadingButton: LoadingButton;
+}
+start() {
+  this.$refs.loadingButton?.start()
+}
+```
+
+In Vue3 you need to use an `InstanceType` object of your type:
+
+```ts
+// Template
+<LoadingButton ref="loadingButton" @click="start">Loading</LoadingButton>
+// Script
+const loadingButton = ref<InstanceType<typeof LoadingButton>>();
+function start() {
+  loadingButton.value?.start()
+}
+```
+
+### 2.5. Updating packages
+
+These were the main packages that needed to be upgraded:
+
+- [vue](https://github.com/vuejs/vue)
+- [vue-i18n](https://github.com/kazupon/vue-i18n)
+- [vue-router](https://github.com/vuejs/vue-router)
+- [vuex](https://github.com/vuejs/vuex)
+- [vuex-persistedstate](https://github.com/robinvdvleuten/vuex-persistedstate)
+
+## 3. Migrating Vue3 to React
+
+I copy-pasted all the [Vue2](https://github.com/alexandroMtzG/vue2-starter) views and components to the [React](https://github.com/AlexandroMtzG/react-starter) project. But as I tried to rewrite the components, I found out that [Vue3](https://github.com/alexandroMtzG/vue3-starter) seemed more like React.
+
+### 3.1. Component Definition
+
+We've seen the [Vue3 component structure](saasfrontends-v1#2-1-component-definition), now take a look at how React does it:
+
+```tsx
+import { useEffect } from "react";
+export default function SampleComponent() {
+  ...
+  useEffect(() => {
+    console.log("mounted");
+  }, []);
+  return (<div></div>);
+}
+```
+
+### 3.2. Store
+
+The hardest thing to copy-paste and fix was the **Store**. React uses **reducers**, whereas Vue3 uses a vue-specific library.
+
+[Click here to learn more](https://saasfrontends.com/docs/store).
+
+### 3.3. Reactive Variables
+
+React uses Hooks, which seemed so strange to me, at first. Once you get the grasp of it, it's so obviously effective.
+
+```tsx
+const [counter, setCounter] = useState(0)
+```
+
+Every function that references reactive variables, will be called and the UI will re-render.
+
+### 3.4. Meta-tags
+
+Another thing that changed completly was URL meta tags. React has a ton of libraries for everything, but I ended up using `react-helmet`.
+
+[You can read more about meta-tags here](https://saasfrontends.com/docs/meta-tags).
+
+### 3.4. Template Refs
+
+I didn't quite like the React-way to declare child components (if you want to call its functions):
+
+```tsx LoadingButtons.tsx
+export interface RefLoadingButton {
+  start: () => void;
+  stop: () => void;
+}
+...
+const LoadingButton = ({ disabled, children, onClick }, ref: Ref<RefLoadingButton>) => {
+  const [loading, setLoading] = useState(false);
+  useImperativeHandle(ref, () => ({
+    start,
+    stop,
+  }));
+  function start() {
+    setLoading(true);
+  }
+  ...
+}
+export default forwardRef(LoadingButton);
+```
+
+Calling a child component method:
+
+```tsx
+const loadingButton = useRef<RefLoadingButton>(null);
+function start() {
+  loadingButton.current.start();
+}
+return (
+  <div>
+    <LoadingButton ref={loadingButton} onClick={() => start()}>
+      Loading
+    </LoadingButton>
+  <div>)
+```
+
+## 4. Migrating React to Svelte
+
+Svelte is basically React, so the logic thing to do was to copy-pase the components into the [Svelte project](https://github.com/alexandroMtzG/svelte-starter) and fix them.
+
+### 4.1. Component Definition
+
+I implemented Svelte components into 2 parts, **script** and **html**. All **styles** are Tailwind CSS utilities.
+
+```html SampleSvelte.svelte
+<script lang="ts">
+  import { onMount } from "svelte";
+  onMount(() => { ... });
+  ...
+</script>
+<div>...</div>
+```
+
+### 4.2. Reactive Variables
+
+Every variable is reactive, and there's a simpler way to declare component properties:
+
+```js
+// property
+export let title: string
+// optional property
+export let description: string = ''
+// reactive variable
+let counter: number = 0
+```
+
+### 4.3. Computed Functions
+
+If you want a function to be called when the reactive variable changes, you need to prefix it with `$:`:
+
+```tsx
+$: discountedPrice = (): number => {
+  if (!selectedPrice) {
+    return 0
+  }
+  return selectedPrice.price * 0.8
+}
+```
+
+[Read the Svelte docs](https://svelte.dev/tutorial/reactive-declarations).
+
+### 4.4. Template Refs
+
+Svelte has the simplest template-refs sintax. You only need to export the properties and methods that will be accessed by a parent component:
+
+```html
+<script lang="ts">
+  ...
+  let loading: boolean = false;
+  export function start() {
+    loading = true;
+  }
+</script>
+...
+```
+
+And use the child component:
+
+```js
+let loadingButton: LoadingButton;
+function start() {
+    loadingButton.start();
+}
+...
+<LoadingButton bind:this={loadingButton} on:click={() => start()}>Loading</LoadingButton>
+```
+
+## 5. Creating the Documentation
+
+I needed a website where users can discover the templates, so I took the **Vue2 SaasFrontend** and started coding:
+
+- Landing
+- Docs
+- Blog
+
+Honestly I wasn't happy with the result, specially because I wanted to write in **mdx** sintax to showcase the UI components and to write more blog posts.
+
+I found out that the tailwindcss.com documentation uses **Next.js** and is open source, although it has no MIT license. So I cloned it, deleted all I didn't need, redesigned it and, started writing.
+
+**I hope redesigned the website enought to be considered fair use**. If I did not, I will have to write this Next.js site from scratch.
+
+## 6. Creating Free UI Components
+
+Since I created the same app in 4 frameworks/libraries, I ended up having a small UI component library:
+
+- Buttons
+- Banners
+- Modals
+- Tabs
+- ...
+
+So it occurred to me that I needed a /components section on this website.
+
+You can preview, copy, and download 13 components in Vue2, Vue3, React and Svelte.
+
+[View all UI Components...](https://saasfrontends.com/components)
+
+## 7. Creating the Editions
+
+Finally, today (January 16th, 2022), I got to put a price on my product. It's one of the hardest parts, but at least I knew:
+
+- I wanted to have at least one edition as open source, so devs/designers could browse my code.
+- I wanted to have a sandbox codebase (no API).
+- I wanted to have a full stack codebase.
+
+The end result was:
+
+| Edition   | Price                                    | Features                             | Vue2                                                                                                                                                                                                           | Vue3                                                                                                                                                                                                          | React                                                                                                                                                                                                           | Svelte                                                                                                                                                                                                          |
+| --------- | ---------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Starter   | <b>Open source</b>                       | Only front pages                     | <a target="_blank" href='https://github.com/alexandroMtzG/vue2-starter'>&rarr;</a>                                                                                                                             | <a target="_blank" href='https://github.com/alexandroMtzG/vue3-starter'>&rarr;</a>                                                                                                                            | <a target="_blank" href='https://github.com/alexandroMtzG/react-starter'>&rarr;</a>                                                                                                                             | <a target="_blank" href='https://github.com/alexandroMtzG/svelte-starter'>&rarr;</a>                                                                                                                            |
+| Sandbox   | <b>$19</b><small> usd/framework </small> | 1 frontend (+30 pages)               | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue2?variant=Sandbox&_gl=1*1lc2r4a*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODY2My4w'>&rarr;</a>   | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue3?variant=Sandbox&_gl=1*1nhckoi*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODc0MC4w'>&rarr;</a>  | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-React?variant=Sandbox&_gl=1*9nq9fq*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODgzNS4w'>&rarr;</a>    | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Svelte?variant=Sandbox&_gl=1*9v96it*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2OTAwMi4w'>&rarr;</a>   |
+| Essential | <b>$299</b> <small>usd</small>           | 1 frontend + .NET API                | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue2?variant=Essential&_gl=1*18efjvh*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODY3NS4w'>&rarr;</a> | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue3?variant=Essential&_gl=1*3dy0j0*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODc5NC4w'>&rarr;</a> | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-React?variant=Essential&_gl=1*1b0phcb*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2ODg1OC4w'>&rarr;</a> | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Svelte?variant=Essential&_gl=1*9v96it*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM2OTAwMi4w'>&rarr;</a> |
+| Premium   | <b>$499</b> <small>usd</small>           | 1 frontend + .NET API + Team license | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue2?variant=Premium&_gl=1*184r0bv*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM3MTI2NS4w'>&rarr;</a>   | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Vue3?variant=Premium&_gl=1*faq2vn*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM3MTI4My4w'>&rarr;</a>   | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-React?variant=Premium&_gl=1*1bg95wn*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM3MTMxMy4w'>&rarr;</a>   | <a target="_blank" href='https://alexandromg.gumroad.com/l/SaasFrontends-Svelte?variant=Premium&_gl=1*1c1tfen*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0MjM2NzI0OC40LjEuMTY0MjM3MTMyNC4w'>&rarr;</a>  |
+
+[Read more...](https://saasfrontends.com/docs/editions)
+
+## 8. Publishing Demos
+
+For each edition, I wanted to make a demo. So if there are 4 frontends and 4 editions, I had to make 4 x 4 = 16 demos.
+
+Good thing Essential and Premium are the same codebase, so the end result was:
+
+| Edition             | Vue2                                                                         | Vue3                                                                         | React                                                                         | Svelte                                                                         |
+| ------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Starter             | <a target="_blank" href='https://starter.vue2.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://starter.vue3.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://starter.react.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://starter.svelte.saasfrontends.com/'>&rarr;</a> |
+| Sandbox             | <a target="_blank" href='https://sandbox.vue2.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://sandbox.vue3.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://sandbox.react.saasfrontends.com/'>&rarr;</a> | <a target="_blank" href='https://sandbox.svelte.saasfrontends.com/'>&rarr;</a> |
+| Essential & Premium | <a target="_blank" href='https://vue2.saasfrontends.com/'>&rarr;</a>         | <a target="_blank" href='https://vue3.saasfrontends.com/'>&rarr;</a>         | <a target="_blank" href='https://react.saasfrontends.com/'>&rarr;</a>         | <a target="_blank" href='https://svelte.saasfrontends.com/'>&rarr;</a>         |
+
+The **_Starter edition codebases_** have their own repo, and they are published to **Vercel**.
+
+The **_Sandbox/Essential/Premium edition codebases_** belong to the same repo, but on the following branches:
+
+- vue2-sandbox-demo
+- vue3-sandbox-demo
+- react-sandbox-demo
+- svelte-sandbox-demo
+- vue2-essential-demo
+- vue3-essential-demo
+- react-essential-demo
+- svelte-essential-demo
+
+With each **Sandbox** commit to production, it publishes to **Vercel**.
+
+For the **Essential** codebases eployments are manually made to a **AWS Lightsail IIS server**.
+
+## 9. Publishing Codebases
+
+Once I was happy with the [demos](https://saasfrontends.com/docs/demos), I created the following branches:
+
+- vue2-sandbox-codebase
+- vue3-sandbox-codebase
+- react-sandbox-codebase
+- svelte-sandbox-codebase
+- vue2-essential-codebase
+- vue3-essential-codebase
+- react-essential-codebase
+- svelte-essential-codebase
+
+Each one of them has customizable environment values, such as:
+
+- **PRODUCT_URL**: your website URL (without https or slashes)
+- **DEVELOPMENT_STRIPE_PUBLIC_KEY**
+- **DEVELOPMENT_STRIPE_SECRET_KEY**
+- **PRODUCTION_STRIPE_PUBLIC_KEY**
+- **PRODUCTION_STRIPE_SECRET_KEY**
+- And more...
+
+## 10. Publishing on Gumroad
+
+I decided to use Gumroad instead of Stripe, because now I could get reviews. On netcoresaas.com I implemented my own way of giving my customers the codebase.
+
+_My Gumroad Products_:
+
+- [SaasFrontend - Vue2](https://alexandromg.gumroad.com/l/SaasFrontends-Vue2)
+- [SaasFrontend - Vue3](https://alexandromg.gumroad.com/l/SaasFrontends-Vue3)
+- [SaasFrontend - React](https://alexandromg.gumroad.com/l/SaasFrontends-React)
+- [SaasFrontend - Svelte](https://alexandromg.gumroad.com/l/SaasFrontends-Svelte)
+
+## 11. Creating the Blog
+
+Finally, this blog post.
+
+It took me all day to write this. I hope it was useful to you in some way.
+
+--
+
+<a href="support">Let me know</a> what would you like me to write about.
