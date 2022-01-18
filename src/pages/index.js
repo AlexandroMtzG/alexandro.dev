@@ -91,7 +91,7 @@ export default function Home() {
             className="text-teal-800 font-normal hover:text-teal-800 hover:underline"
           >
             {' '}
-            Tailwind
+            Tailwind CSS
           </a>
           ,{' '}
           <a
