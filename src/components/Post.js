@@ -88,14 +88,18 @@ export default function Post({ meta, children, posts }) {
           <div className="prose max-w-none pt-10 pb-8">
             <MDXProvider components={mdxComponents}>{children}</MDXProvider>
           </div>
-            <div className="pt-6 pb-16">
-              <p>
-                Want to read more posts like this?{' '}
-                <a target="_blank" href="http://eepurl.com/hl_BIr" className="font-medium text-purple-500 hover:text-purple-600">
-                  Subscribe to my newsletter &rarr;
-                </a>
-              </p>
-            </div>
+          <div className="pt-6 pb-16">
+            <p>
+              Want to read more posts like this?{' '}
+              <a
+                target="_blank"
+                href="https://alexandromg.gumroad.com/"
+                className="font-medium text-purple-500 hover:text-purple-600"
+              >
+                Subscribe to my Gumroad page &rarr;
+              </a>
+            </p>
+          </div>
         </div>
         <footer className="text-sm font-medium leading-5 divide-y divide-gray-200 xl:col-start-1 xl:row-start-2">
           {(next || previous) && (

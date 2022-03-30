@@ -49,7 +49,33 @@ export default function Home() {
           , full-stack developer.
         </p>
         <p className="text-lg leading-7 text-gray-500">
-          My favorite tools are{' '}
+          These are the main tools I use:{' '}
+          <a
+            target="_blank"
+            href="https://remix.run/"
+            className="text-gray-800 font-normal hover:text-gray-700 hover:underline"
+          >
+            Remix
+          </a>
+          ,{' '}
+          <a
+            target="_blank"
+            href="https://reactjs.org/"
+            className="text-blue-700 font-normal hover:text-blue-700 hover:underline"
+          >
+            {' '}
+            React
+          </a>
+          ,{' '}
+          <a
+            target="_blank"
+            href="https://tailwindcss.com"
+            className="text-teal-500 font-normal hover:text-teal-500 hover:underline"
+          >
+            {' '}
+            Tailwind CSS
+          </a>
+          ,{' '}
           <a
             target="_blank"
             href="http://aka.ms/net"
@@ -69,29 +95,11 @@ export default function Home() {
           ,{' '}
           <a
             target="_blank"
-            href="https://reactjs.org/"
-            className="text-blue-800 font-normal hover:text-blue-800 hover:underline"
-          >
-            {' '}
-            React
-          </a>
-          ,{' '}
-          <a
-            target="_blank"
             href="https://svelte.dev/"
             className="text-orange-800 font-normal hover:text-orange-800 hover:underline"
           >
             {' '}
             Svelte
-          </a>
-          ,{' '}
-          <a
-            target="_blank"
-            href="https://tailwindcss.com"
-            className="text-teal-800 font-normal hover:text-teal-800 hover:underline"
-          >
-            {' '}
-            Tailwind CSS
           </a>
           ,{' '}
           <a
@@ -110,6 +118,24 @@ export default function Home() {
           >
             {' '}
             Vercel
+          </a>
+          ,{' '}
+          <a
+            target="_blank"
+            href="https://supabase.io/"
+            className="text-green-800 font-normal hover:text-green-900 hover:underline"
+          >
+            {' '}
+            Supabase
+          </a>
+          ,{' '}
+          <a
+            target="_blank"
+            href="https://prisma.io/"
+            className="text-gray-800 font-normal hover:text-gray-900 hover:underline"
+          >
+            {' '}
+            Prisma
           </a>
           ,{' '}
           <a

@@ -1,0 +1,262 @@
+import { alexandromtzg } from '@/authors'
+import image from './cover.png'
+
+export const meta = {
+  title: 'Remix SaaS kit - Core Concepts and QuickStart Tutorial',
+  category: 'Article',
+  description: `Learn what you can do with the Remix SaaS kit.`,
+  date: '2022-03-29T12:43:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Thank you for trying out my [Remix SaaS kit](https://alexandromg.gumroad.com/l/SaasFrontends-Remix)! I did not expect so many downloads, so I thought I this Quickstart Tutorial.
+
+If you like what you got, consider giving it a 5-star on Gumroad :).
+
+Introducing Remix SaaS kit v1.
+
+<!--more-->
+
+<img src={image} alt="Remix SaaS kit v1" />
+
+## 1) Core Concepts
+
+Before you follow the tutorial, I want you to know why I built it the way it is.
+
+### 1.1) Tenant
+
+I wanted to make an app where 1 email could have multiple accounts, like Notion.
+
+A Tenant has its own:
+
+- Stripe Customer ID - Created at **_/register_**
+
+- Stripe Subscription ID - Created at **_/app/settings/subscription_**
+
+- Tenant Members - Created at **_/app/settings/members_**
+
+- Workspaces - Created at **_/app/settings/workspaces_**
+
+### 1.2) Workspace
+
+This depends on your SaaS implementation. For example, I have a SaaS where the Workspace is a Legal Company, and another one where each Workspace represents the Current Project. It's up to you.
+
+A Workspace has its own:
+
+- Workspace Members
+
+- Links to other Workspaces
+
+- Employees
+
+### 1.3) Link
+
+You can delete this in your implementation, but it's there if you need it.
+
+I wanted to make a SaaS where my users could like accounts with other users. For example, Workspace X from Tenant A, wants to share information with Workspace Z from Tenant B. On this implementation, there's a direction, where one Workspace is a **_Provider_** and the other one a **_Client_**.
+
+A Link has its own:
+
+- Contracts
+
+### 1.4) Contracts
+
+You can delete this in your implementation, but it's there if you need it.
+
+On every SaaS kit, I implemented a Contracts app, on which two linked workspaces can share 1 contract, and it belongs to both of them. Also, you can see how PDF upload/preview work.
+
+A Contract references:
+
+- Linked Workspace Members
+
+- Current Workspace Employees
+
+### 1.5) Employee
+
+Simple **CRUD** demo.
+
+### 1.6) TenantId, WorkspaceId, and LinkId fields
+
+Since this boilerplate is designed to support multiple tenants, each with its own workspaces, you have to implement these fields (on your **prisma** calls) on every Entity you create, hence the **_Contracts_** and **_Employees_** demo. I plan to implement an automatic way of doing this, [subscribe](https://alexandromg.gumroad.com/?_ga=2.214548439.19719977.1648435244-1074079387.1642355847&_gl=1*kefbrg*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0ODU4MjU1OC43Mi4xLjE2NDg1ODU3MjMuMA..) or [follow me](https://twitter.com/AlexandroMtzG) to stay tuned!
+
+---
+
+## 2) Quickstart Tutorial
+
+Follow these steps to see what Remix SaaS kit can do.
+
+### 2.1) Requirements:
+
+- [Stripe account](https://dashboard.stripe.com/register)
+
+- [Postmark account](https://account.postmarkapp.com/sign_up) _(use REMIXSAASPOSTMARK code for -20%)_
+
+- [Supabase account](https://supabase.com/) _(you can use your own [Prisma-supported-database](https://www.prisma.io/docs/reference/database-reference/supported-databases) provider)_
+
+- [Formspree account](https://formspree.io/register) (optional)
+
+### 2.2) Git
+
+Open the downloaded project folder _(I'm using VSCode)_, open a Terminal and run:
+
+```
+git init
+git add .
+git commit -am "initial"
+```
+
+### 2.3) Environment file:
+
+Rename the `.env.example` file to just `.env`.
+
+![.env file](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/env.png)
+
+Update the _REMIX_SESSION_SECRET_ value to something secure ~~(like abc123)~~.
+
+Set the _REMIX_ADMIN_EMAIL_ with your email and something random for _REMIX_ADMIN_PASSWORD_.
+
+![Credentials](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/credentials.png)
+
+Get your [Stripe Secret Key](https://dashboard.stripe.com/test/apikeys) and set it to _REMIX_STRIPE_SK_.
+
+![Stripe Secret Key (use your own)](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/stripe.png)
+
+Open your [Postmark Servers Dashboard](https://account.postmarkapp.com/servers), select or create your server, click on API Tokens and set it to _REMIX_POSTMARK_SERVER_TOKEN_.
+
+![Postmark Test Server (use your own)](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/postmark.png)
+
+(Optional) Open your [Formspree Forms Dashboard](https://formspree.io/forms), select or create your form, click on Integration, and set the Form's endpoint to _REMIX_INTEGRATIONS_CONTACT_FORMSPREE_.
+
+![Formspree Test Form (use your own)](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/formspree.png)
+
+Up to this point, you should have only 1 commit:
+
+![.env.example was renamed to .env, but .env is ignored by git](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/env-commit.png)
+
+### 2.4) Database:
+
+I highly recommend building your app first with SQLite, then moving to something like PostgreSQL/MySQL.
+
+If you're not using SQLite, identify your [database connection string format](https://www.prisma.io/docs/concepts/database-connectors) and set it to the _DATABASE_URL_ environment variable.
+
+![PostgreSQL URL format](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/database.png)
+
+_IMPORTANT: If you're using Supabase and you will host your app on a Serverles environment like Vercel or AWS Lambda, [use the Connection Pooling String as specified here](https://supabase.com/docs/guides/integrations/prisma#connection-pooling-with-supabase). As you can see, use the normal PostgreSQL connection string when creating, migrating, and seeding the database with Prisma, but use the Connection Pooling String when deploying to a Serverless environment._
+
+Open the `schema.prisma` file, and set the corresponding database provider ([sqlite](https://www.prisma.io/docs/concepts/database-connectors/sqlite), [postgresql](https://www.prisma.io/docs/concepts/database-connectors/postgresql), [mysql](https://www.prisma.io/docs/concepts/database-connectors/mysql), [sqlserver](https://www.prisma.io/docs/concepts/database-connectors/sql-server), [mongodb](https://www.prisma.io/docs/concepts/database-connectors/mongodb), or [cockroachdb](https://www.prisma.io/docs/concepts/database-connectors/cockroachdb)).
+
+![Since I'm using Supabase, I set postgresql](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/database-provider.png)
+
+Run the first migration and seed the database using this command:
+
+```
+npx prisma migrate dev --name init
+```
+
+You should get the following output:
+
+![Prisma Migration and Seed](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/database-migration.png)
+
+If for any reason, the migration was created successfully but did not seed the database, use the following command:
+
+```
+npx prisma db seed
+```
+
+If you mess up the database, you can always reset it with Prisma, or drop the tables manually:
+
+![Drop Tables](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/database-drop.png)
+
+**DROP TABLES Script:**
+
+```
+DROP TABLE IF EXISTS "_prisma_migrations";
+DROP TABLE IF EXISTS "Joke";
+DROP TABLE IF EXISTS "ContractMember";
+DROP TABLE IF EXISTS "ContractActivity";
+DROP TABLE IF EXISTS "ContractEmployee";
+DROP TABLE IF EXISTS "Contract";
+DROP TABLE IF EXISTS "Employee";
+DROP TABLE IF EXISTS "Link";
+DROP TABLE IF EXISTS "SubscriptionFeature";
+DROP TABLE IF EXISTS "SubscriptionPrice";
+DROP TABLE IF EXISTS "SubscriptionProduct";
+DROP TABLE IF EXISTS "TenantUserInvitationWorkspace";
+DROP TABLE IF EXISTS "TenantUserInvitation";
+DROP TABLE IF EXISTS "WorkspaceUser";
+DROP TABLE IF EXISTS "Workspace";
+DROP TABLE IF EXISTS "TenantUser";
+DROP TABLE IF EXISTS "Tenant";
+DROP TABLE IF EXISTS "User";
+```
+
+Up to this point, you should have 3 commits:
+
+![Files generated by the Prisma migration](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/database-commit.png)
+
+### 2.4) App:
+
+If you haven't already, install the dependencies:
+
+```
+npm install
+```
+
+Run the application:
+
+```
+npm run dev
+```
+
+Open [https://localhost:3000](https://localhost:3000), you should see the landing page:
+
+![Dark mode landing page](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/landing.png)
+
+Click on the **Dark/Light mode Toggle**:
+
+![Light mode landing page](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/landing-light.png)
+
+Get rid of the `<TopBanner />` component, or customize it if you're advertising something, like me ([other SaaS kits](https://alexandromg.gumroad.com/)).
+
+![TopBanner.tsx component (used on root.tsx)](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/topbanner.png)
+
+Go to the **_/pricing_** page and click on Go to **_/admin/pricing_**.
+
+_NOTE: Before we persist the Prices to the database, you can play with the pricing by modifying the `plans.server.ts` file._
+
+![Warning Banner - prices are being loaded from a file, not from your database](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/warning.png)
+
+Log in as your admin user. If successful, it will redirect you with a Session Cookie to **_/admin/pricing_**.
+
+Here we can persist the prices to our database and to our Stripe account by clicking the orange button.
+
+![Admin: Pricing management (CREATE only, you cannot UPDATE nor DELETE)](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/admin-pricing.png)
+
+_NOTE: If you've persisted the prices to your DB and Stripe, but you want to make a change, you could **manually DELETE** the records on the following tables: "SubscriptionFeature", "SubscriptionPrice" and "SubscriptionProduct"._
+
+![DELETE pricing script](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/pricing-drop.png)
+
+Now that our prices exist, go to **_/register_** and create a sample account (with a real email to get the **_Welcome_** email).
+
+![Register page](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/register.png)
+
+You should get a welcome email.
+
+![Welcome email](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/welcome-email.png)
+
+You will be redirected to the Dashboard:
+
+![Dashboard](https://yahooder.sirv.com/saasfrontends/remix/blog/quickstart/dashboard.png)
+
+That's all you need to get started using the boilerplate. And of course, you could also follow the `README.md` file.
+
+## Early Access
+
+[Click here to get -50 off](https://alexandromg.gumroad.com/l/SaasFrontends-Remix/early-access?_gl=1*1baxzub*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0ODQ3NDA2Mi42Ni4xLjE2NDg0NzQ4ODcuMA..), for a limited time only.
+
+[Subscribe](https://alexandromg.gumroad.com/?_ga=2.214548439.19719977.1648435244-1074079387.1642355847&_gl=1*kefbrg*_ga*MTA3NDA3OTM4Ny4xNjQyMzU1ODQ3*_ga_6LJN6D94N6*MTY0ODU4MjU1OC43Mi4xLjE2NDg1ODU3MjMuMA..) or [follow me](https://twitter.com/AlexandroMtzG) to stay tuned!
+
+---
+
+Feel free to [comment](https://dev.to/alexandromtzg/remix-saas-kit-quickstart-core-concepts-3c35#comments) if you have any questions.
