@@ -3,7 +3,7 @@ import image from './card.png'
 
 export const meta = {
   title: "7 things I've learned using Remix for 1 month",
-  category: "Article",
+  category: 'Article',
   description: `Full-stack routes, loaders, actions, error boundaries, optimistic UI, and more.`,
   date: '2022-04-20T13:39:00.000Z',
   authors: [alexandromtzg],
@@ -20,52 +20,47 @@ I’ve been using [@remix_run](https://twitter.com/remix_run) for 1 month now, i
 - UI/UX 💅🏻
 - Integrations 🎁
 
-<img src={image} alt="Remix learnings after 1 month" />
-
 <!--more-->
 
-# 1. Full-stack Routes 💽
+<img src={image} alt="Remix learnings after 1 month" />
+
+## 1. Full-stack Routes 💽
 
 Everything you need on ONE file. Loader export to get data + Action export to submit forms + a React component to handle UI = SSR in under 100ms.
 
 ![Full Stack Routes](https://yahooder.sirv.com/saasfrontends/remix/blog/1-month/full-stack-routes.jpeg)
 
-# 2. Loaders ⌛
+## 2. Loaders ⌛
 
 Everything you need to load in one function: User state, redirect unauthorized users, i18n translations, SEO meta info…
 
 ![Full Stack Routes](https://yahooder.sirv.com/saasfrontends/remix/blog/1-month/loaders.jpeg)
 
-
-# 3. Actions ⚡️
+## 3. Actions ⚡️
 
 Validate form submission, parse array values, perform DB operations, use third-party libraries (eg: send email), and redirect the user when completed.
 
 ![Full Stack Routes](https://yahooder.sirv.com/saasfrontends/remix/blog/1-month/actions.jpeg)
 
-
-# 4. Error Boundaries ⚠️
+## 4. Error Boundaries ⚠️
 
 Handle unexpected errors with ErrorBoundary route exports, and expected errors with ClientBoundary exports.
 
 ![Full Stack Routes](https://yahooder.sirv.com/saasfrontends/remix/blog/1-month/error-boundaries.jpeg)
 
+## 5. No more Loading Spinners 💀
 
-# 5. No more Loading Spinners 💀
-
-Using SPA means that you have to wait for the server to load the data, in the meantime, you need to calm down your users by giving them a loading spinner ↻. 
+Using SPA means that you have to wait for the server to load the data, in the meantime, you need to calm down your users by giving them a loading spinner ↻.
 
 With SSR you get the fully interactive page, with Remix you don't even think about it.
 
-
-# 6. UI/UX 💅🏻
+## 6. UI/UX 💅🏻
 
 I don't have to give up everything I've learned with React + Tailwind CSS components, in fact, now I focus more on them to give my users great UI/UX.
 
 ![Full Stack Routes](https://yahooder.sirv.com/saasfrontends/remix/blog/1-month/ui-ux.jpeg)
 
-
-# 7. Integrations 🎁
+## 7. Integrations 🎁
 
 Working with DBs has never been easier with [@prisma](https://twitter.com/prisma) + SQLite for local dev, and [@supabase](https://twitter.com/supabase) for a fast ⚡️ PostgreSQL prod app; combined with [@stripe](https://twitter.com/stripe) and [@postmarkapp](https://twitter.com/postmarkapp), it gives us full power for any SaaS app idea that comes. & of course [@vercel](https://twitter.com/vercel) for hosting 👌
 
