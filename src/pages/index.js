@@ -3,12 +3,47 @@ import Link from 'next/link'
 import Head from 'next/head'
 import getAllPostPreviews from '@/getAllPostPreviews'
 import twitterCard from '@/img/twitter-card.png'
-
+import { useState } from 'react'
+import Newsletter from '@/components/Newsletter'
 const posts = getAllPostPreviews()
 
 const postDateTemplate = tinytime('{MMMM} {DD}, {YYYY}')
 
-export default function Home() {
+export default function Home({ url }) {
+  const [i, setI] = useState(0)
+  function next() {
+    if (i + 1 === names.length) {
+      setI(0)
+    } else {
+      setI(i + 1)
+    }
+  }
+  const names = [
+    {
+      website: 'saasrock.com',
+      title: 'SaaS Rock 🪨',
+    },
+    {
+      website: 'velozaas.com',
+      title: 'Velozaas',
+    },
+    {
+      website: 'velozsaas.com',
+      title: 'Veloz SaaS',
+    },
+    {
+      website: 'velozos.com',
+      title: 'Veloz OS',
+    },
+    {
+      website: 'velozify.com',
+      title: 'Velozify',
+    },
+    {
+      website: 'ixsaas.com',
+      title: 'ixSaaS',
+    },
+  ]
   return (
     <div className="divide-y divide-gray-200">
       <Head>
@@ -32,24 +67,13 @@ export default function Home() {
         <title>Blog - alexandro.dev</title>
         <meta name="description" content="Dev tips, advice and stories from @alexandromtzg." />
       </Head>
-
       <div className="pt-6 pb-8 space-y-2 md:space-y-5">
         {/* <h1 className="text-3xl leading-9 font-extrabold text-gray-900 tracking-tight sm:text-4xl sm:leading-10 md:text-3xl md:leading-14">
           Blog
         </h1> */}
-        <p className="text-lg leading-7 text-gray-500">
-          I'm{' '}
-          <a
-            target="_blank"
-            href="https://twitter.com/alexandromtzg"
-            className="underline text-gray-500 hover:text-gray-800"
-          >
-            @AlexandroMtzG
-          </a>
-          , full-stack developer.
-        </p>
-        <p className="text-lg leading-7 text-gray-500">
-          These are the main tools I use:{' '}
+
+        {/* <p className="text-lg leading-7 text-gray-500">
+          My favorite tools:{' '}
           <a
             target="_blank"
             href="https://remix.run/"
@@ -79,7 +103,7 @@ export default function Home() {
           <a
             target="_blank"
             href="http://aka.ms/net"
-            className="text-purple-800 font-normal hover:text-purple-700 hover:underline"
+            className="text-purple-700 font-normal hover:text-purple-700 hover:underline"
           >
             .NET
           </a>
@@ -87,7 +111,7 @@ export default function Home() {
           <a
             target="_blank"
             href="https://vuejs.org"
-            className="text-green-800 font-normal hover:text-green-800 hover:underline"
+            className="text-green-700 font-normal hover:text-green-800 hover:underline"
           >
             {' '}
             Vue
@@ -96,7 +120,7 @@ export default function Home() {
           <a
             target="_blank"
             href="https://svelte.dev/"
-            className="text-orange-800 font-normal hover:text-orange-800 hover:underline"
+            className="text-orange-700 font-normal hover:text-orange-800 hover:underline"
           >
             {' '}
             Svelte
@@ -123,7 +147,7 @@ export default function Home() {
           <a
             target="_blank"
             href="https://supabase.io/"
-            className="text-green-800 font-normal hover:text-green-900 hover:underline"
+            className="text-green-700 font-normal hover:text-green-900 hover:underline"
           >
             {' '}
             Supabase
@@ -132,7 +156,7 @@ export default function Home() {
           <a
             target="_blank"
             href="https://prisma.io/"
-            className="text-gray-800 font-normal hover:text-gray-900 hover:underline"
+            className="text-indigo-800 font-normal hover:text-indigo-900 hover:underline"
           >
             {' '}
             Prisma
@@ -156,7 +180,8 @@ export default function Home() {
             Lightsail
           </a>
           .
-        </p>
+        </p> */}
+        <Newsletter url={url} />
       </div>
       <ul className="divide-y divide-gray-200">
         {posts.map(({ link, module: { default: Component, meta } }) => {
@@ -198,4 +223,12 @@ export default function Home() {
       </ul>
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  return {
+    props: {
+      url: `https://app.convertkit.com/forms/${process.env.CONVERTKIT_FORM_ID}/subscriptions`,
+    },
+  }
 }

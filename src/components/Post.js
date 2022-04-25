@@ -90,14 +90,23 @@ export default function Post({ meta, children, posts }) {
           </div>
           <div className="pt-6 pb-16">
             <p>
-              Want to read more posts like this?{' '}
+              If you liked this post, follow me on{' '}
               <a
                 target="_blank"
-                href="https://alexandromg.gumroad.com/"
+                href="https://twitter.com/AlexandroMtzG"
                 className="font-medium text-purple-500 hover:text-purple-600"
               >
-                Subscribe to my Gumroad page &rarr;
-              </a>
+                Twitter
+              </a>{' '}
+              or subscribe to my{' '}
+              <a
+                target="_blank"
+                href="https://www.getrevue.co/profile/alexandromtzg"
+                className="font-medium text-purple-500 hover:text-purple-600"
+              >
+                Newsletter
+              </a>{' '}
+              for more 😃{' '}
             </p>
           </div>
         </div>

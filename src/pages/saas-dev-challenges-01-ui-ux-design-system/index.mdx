@@ -1,0 +1,114 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: '🎯 SaaS dev challenges - #01 - ‍🎨 UI/UX & design system',
+  category: 'Article',
+  description: `It's daunting thinking of building a SaaS app because deep down, we all know how much stuff we'll need to go through, and you know that every day will be a decision challenge. Especially if you're alone.`,
+  date: '2022-04-25T09:30:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+It's daunting thinking of building a SaaS app because deep down, we all know how much stuff we'll need to go through, and you know that every day will be a decision challenge. Especially if you're alone.
+
+<img src={image} alt="SaaS dev challenges - #01 - UI/UX & design system" />
+
+<!--more-->
+
+We've all had that **_aha!_** SaaS idea moment 💡. But not all of us have had a successful SaaS application. There are so many things a modern web user takes for granted: Great **UI/UX**, **auth** pages, a **pricing** model that fits their needs, a customizable **profile**, and so on. And don't get me started on what we developers know we need: A **UI library**, **GDPR**, and some other non-essential stuff (_dark mode_, _multi-language_…).
+
+This 🎯 **_SaaS dev challenges_** series will talk about the challenges I've come across while trying to build something.
+
+- #01 - 🎨 **UI/UX & design system** _(inputs, buttons… components)_
+- #02 - 🗝 ️**Authentication** _(login, register, forgot, reset, emails…)_
+- #03 - 💸 **Pricing** _(subscriptions, payments, cards…)_
+- #04 - 👩‍💼 **Admin** _(tenants, dashboard, Helpdesk, CRM, API keys…)_
+- #05 - ⚙️ **Settings** _(profile, members, permissions, dashboard, API keys…)_
+- #06 - 🛬 **Landing** _(GDPR, multi-language, dark mode)_
+- #07 - 🦄 The Actual SaaS **Application** (finally!)
+
+---
+
+## The idea stage 💡
+
+Let's say you have a great Invoicing idea. You know that it will compete will huge software companies.
+
+## The motivation stage 💪
+
+You open up the terminal, run your favorite framework CLI command to create a starter project, open up VS Code, and start working on a CreateInvoiceForm file and complete it in under 1 hour!
+
+## The challenge 🎯 - The UI library
+
+You realize it's the worst form design in the history of form designs. Not really, but you need:
+
+- A custom **_Selector_** component for customer selection.
+- A custom **_Radio_** component for payment types.
+- A custom **_Table_** component for invoice lines.
+- A custom **_Empty State_** component for no-lines states.
+
+And so on…
+
+Right after you started your SaaS idea form, you realize you need to take a step back. Demoralizing 😔.
+
+You either have 2 options:
+
+- Find a great UI component library.
+- Build a great UI component library from scratch.
+
+## My takeaways 📝
+
+### 1) Don't start from scratch
+
+Unless your SaaS idea is a UI library 😅.
+
+### 2) Document your components
+
+Even though you choose an existing UI library, you will need your own design system, so document every new component. You will thank yourself later when you need to build another form, and you want to copy-paste your own components. This is what I tried to do with [https://saasfrontends.com/components](https://saasfrontends.com/components).
+
+### 3) Copy recipes, but add your own ingredient
+
+Don't always try to copy how big companies design their websites. For example, the other day I wanted to make an invoice table, so I took a look at how [Quickbooks](https://quickbooks.intuit.com) does it:
+
+![Quickbooks Create Invoice Form](https://yahooder.sirv.com/blog/saas-dev-challenges/01/quickbooks.png)
+
+Looks great! So I took inspiration from what fields are needed. Then I saw how [Column](https://column.com/) does forms:
+
+![Column Forms](https://yahooder.sirv.com/blog/saas-dev-challenges/01/column.png)
+
+These 2 form designs got me started on my own Invoice form:
+
+![My Create Invoice Form](https://yahooder.sirv.com/blog/saas-dev-challenges/01/create-invoice.png)
+
+I love the minimalist outcome.
+
+## My stack choice 💿 ⚛️ 🎨
+
+_Please note this is based on my experience_
+
+### CSS 🎨
+
+[Tailwind CSS](https://tailwindcss.com) is the UI library that let me feel I was a great UI/UX designer. Also, buy their [Refactoring UI](https://www.refactoringui.com) book to become a better **_devsigner_**.
+
+### JS ⚛️️️️
+
+I made the same UI component library on [Vue2](https://sandbox.vue2.saasfrontends.com/components), [Vue3](https://sandbox.vue3.saasfrontends.com/components), [Svelte](https://sandbox.svelte.saasfrontends.com/components), and [React](https://sandbox.react.saasfrontends.com/components), to test their advantages/disadvantages. I've found out that the front-end framework/library doesn't really matter, they're all great, but **_IT DOES_** matter if you're a full-stack dev, if that's the case, choose [Remix](https://remix.run/) or [Next.js](https://nextjs.org) 😜. This is why [I'll open source them](https://dev.to/alexandromtzg/why-im-open-sourcing-all-my-net-saas-kits-in-april-2022-react-svelte-vue3-vue2-4ki7) and focus 100% on a [Remix SaaS Starter kit](https://alexandromg.gumroad.com/l/SaasFrontends-Remix) _(temporary name)_.
+
+---
+
+## Conclusion 🧑‍🔬
+
+UI is hard for devs, but I believe that every full-stack dev needs to be comfortable making beautiful modern user interfaces. So you either partner with a great designer or start creating your own little _Inputs_, _Buttons_, _Modals_… library on top of a pro UI component framework/library, you don't want your components to look like every other [Tailwind UI](https://tailwindui.com) customer.
+
+Stay tuned for the next 6 planned posts:
+
+- #02 - 🗝 ️**Authentication** (login, register, forgot, reset, emails…)
+- #03 - 💸 **Pricing** (subscriptions, payments, cards…)
+- #04 - 👩‍💼 **Admin** (tenants, dashboard, helpdesk, CRM, API keys…)
+- #05 - ⚙️ **Settings** (profile, members, permissions, dashboard, API keys…)
+- #06 - 🛬 **Landing** (GDPR, multi-language, dark mode)
+- #07 - 🦄 The Actual SaaS **Application**
+
+---
+
+If you liked this post, follow me on [Twitter](https://twitter.com/AlexandroMtzG) for more 😃.
