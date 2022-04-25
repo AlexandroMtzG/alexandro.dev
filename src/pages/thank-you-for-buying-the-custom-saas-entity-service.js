@@ -165,7 +165,7 @@ export default function ThankYou({ actionUrl }) {
   )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   return {
     props: {
       actionUrl: process.env.INTEGRATIONS_CONTACT_FORMSPREE?.toString() ?? '',

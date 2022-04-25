@@ -225,7 +225,7 @@ export default function Home({ url }) {
   )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   return {
     props: {
       url: `https://app.convertkit.com/forms/${process.env.CONVERTKIT_FORM_ID}/subscriptions`,
