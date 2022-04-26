@@ -1,0 +1,147 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: '🎯 SaaS dev challenges - #02 🗝 ️Authentication',
+  category: 'Article',
+  description: `In my previous post, I talked about how UI/UX is a challenge you face right after you start your SaaS. TLDR: Use an existing UI library...`,
+  date: '2022-04-26T02:22:14.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+In my previous post, I talked about how UI/UX is a challenge you face right after you start your SaaS. **_TLDR:_** Use an existing UI library like Tailwind UI, have your components documented ([like this](https://www.hyperui.dev)), and get inspiration from other SaaS websites, but always add your own UI/UX style.
+
+<img src={image} alt="🎯 SaaS dev challenges - #02 🗝 ️Authentication" />
+
+<!--more-->
+
+## TLDR:
+
+- **1 - Why should we authenticate our users?** _It's in their best interest._
+- **2 - Obligatory auth pages**: _login, register, and forgot._
+- **3 - Optional auth pages**: _invitation link, magic-links… _(better UX 😙🤌).
+- **4 - Should you build your own auth system?** _Yes._
+- **5 - Should I use a commercial Auth/Authorization provider?** _No._
+- **6 - Let your users test the app** _then ask them to register 😙🤌)._
+- **7 - Should I add Authorization logic?** _At least identify the userType._
+
+_Remember these takeaways are based on my experience._
+
+---
+
+## 1/7 - Why should we authenticate our users?
+
+Every SaaS application's main goal is to grow its MRR, so the easy answer would be _"to charge our users"_ for using our app.
+
+But really, what's the real reason we should authenticate our users?
+
+Imagine our previously created invoice form:
+
+1. Our unauthenticated user 👨 **creates a quote** _(/quote/cl2d1lgc4000909)_ and sends the PDF to their client 👩.
+
+2. 3 days later, the client 👩 **asks for a quote** modification.
+
+3. Our unauthenticated 👨 user realizes he closed the browser and did not write down the quote-URL _(/quote/cl2d1lgc4000909)_. So he **creates the quote again**, from scratch.
+
+Of course, you could include the quote-URL in the email, but that'd be a horrible user experience for future quotes. So **it's in their best interest** to be identified on every page reload and show them all their data _(even if they don't realize it)_.
+
+Authentication is on every SaaS application's core system, so we either come to terms with it or suffer every time we're building our next SaaS app idea.
+
+## 2/7 - Obligatory auth pages
+
+Every auth system needs at least a [Log-in](https://remix.saasfrontends.com/login) page, a [Sign-up](https://remix.saasfrontends.com/register) page, and a [Forgot-password](https://remix.saasfrontends.com/forgot-password) page.
+
+![Login, Register, and Forgot pages](https://yahooder.sirv.com/blog/saas-dev-challenges/02/auth-pages.png)
+
+It's up to you to decide what to customize, for example, you could:
+
+- *Login* - Add **2FA**.
+- *Register* - Send an **activation email**.
+- *Forgot* - Ask for a secret question or **Captcha**.
+
+But I suggest you follow these principles when signing up new users:
+
+- Ask for as **little information** as you can (maybe just email and password).
+- **Don't ask for a credit card**, you'll scare away a lot of leads.
+- Assume your users will add **_" e M a il sliKE@thisone.com "_**.
+
+## 3/7 - Optional auth pages
+
+We're trying to build a great user experience, these are 2 things you could add:
+
+### 1) Let your tenants invite their members.
+
+Your register page should be for Tenant **Admins**, not Tenant **Users**.
+
+![Add member Form + Invitation/Magic-login-link email](https://yahooder.sirv.com/blog/saas-dev-challenges/02/invite.png)
+
+### 2) Make a simple referral program system.
+
+What's an incentive you can give to a customer to invite other users? Use your imagination but it could be: new customer subscription share, fixed $$$ pro-features…
+
+![Square referral program](https://yahooder.sirv.com/blog/saas-dev-challenges/02/reward.png)
+
+-
+
+This would expand your customer acquisition strategy, and remove the friction of asking every user to visit the **/register** page first.
+
+## 4/7 - Should you build your own auth system?
+
+Let's get real here. You will probably build more than one SaaS application in your career, so learn the fundamentals, keep it simple, and build your own authentication system because you'll reuse it on every one of them: _/login, /register, /forgot-password, /reset-password, /invitation-link, /magic-link_…
+
+## 5/7 - Should I use a commercial Auth provider?
+
+Of course, you could use [Auth0](https://auth0.com), or [Okta](https://www.okta.com), but auth design/dev is not hard as it appears to be, especially in 2022. And why keep your data on a third party? You can't control what you don't have.
+
+It's better to add **social account integrations** for app features, not app authentication _(eg: after a user signs up, let them integrate connect their Instagram account to load all of their photos)_.
+
+### When to use third-party Auth systems?
+
+Don't try to build your auth system from scratch when:
+
+- You're just testing a quick MVP.
+- You're building a **B2C** application where you'll most likely need many of their supported **social identity providers**: _Instagram, Twitter, Gmail, Facebook, Apple, Microsoft Account, LinkedIn, GitHub, Dropbox, Paypal, Basecamp, Salesforce, Shopify, Evernote, Discord, Figma, Slack_… you get the point.
+
+## 6/7 - Let your users test the app, then ask them to register
+
+There are a lot of things a user will think about before subscribing to your SaaS. Don't give them a reason to leave. Let them test your application before you ask them to register.
+
+To use the invoicing app as a reference:
+
+- Add a _/create_| URL to let the **unauthenticated user** create an Invoice.
+- **Warn your users** that they will be asked to register when exporting the invoice PDF.
+- Save the invoice to an **_"unauth-invoice"_** database table.
+- Does the user want to export it as PDF? Ask them to **register first**.
+- Did the user sign up? Transfer the invoice to the **_"invoice"_** table, where there's a **tenantId** property.
+
+But be careful, **we all hate when we get deceived by a website** _(eg: The app lets me design something for 1 hour, but I cannot download it unless I pay $25)_. So let your unauthenticated users what they won't be able to do if they don't sign up or pay after a certain point in their application use.
+
+## 7/7 - Should I add Authorization logic?
+
+Start with something as simple as:
+
+- User is an admin? Redirect to **_/admin_**
+- User is a tenant? Redirect to **_/app_**
+- User is a tenant and wants to access **_/admin_**? Redirect to **_/401_**
+
+But plan for some authorization logic in your pages:
+
+- **_/app/:tenant/settings/organization_** should be for **_TenantOwners_** only.
+- **_/app/:tenant/settings/subscription_** should be for **_TenantAdmins_** only.
+- **_/app/:tenant/contracts_** should be for **_TenantMembers_** only.
+- **_/app/:tenant/public-contracts_** should be public (for **_unauthorized users_**).
+
+---
+
+## Conclusion 🧑‍🔬
+
+That's it for this section, I hope you found it useful in some way. Remember to take with a grain of salt 🧂 every Auth post/tip out there, especially this one.
+
+Now that we identified our users, let's charge them to use our SaaS on a monthly/yearly basis 🤑. Stay tuned for the next 5 planned posts:
+
+- #03 - 💸 **Pricing** (subscriptions, payments, cards…)
+- #04 - 👩‍💼 **Admin** (tenants, dashboard, Helpdesk, CRM, API keys…)
+- #05 - ⚙️ **Settings** (profile, members, permissions, dashboard, API keys…)
+- #06 - 🛬 **Landing** (GDPR, multi-language, dark mode)
+- #07 - 🦄 The Actual SaaS **Application**
