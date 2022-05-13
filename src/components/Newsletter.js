@@ -83,20 +83,12 @@ export default function Newsletter({ url }) {
               {' '}
               Tailwind CSS
             </a>
-            . I also offer an{' '}
-            <a
-              target="_blank"
-              href="https://alexandromg.gumroad.com/l/Unlimited-SaaS-development"
-              className="text-gray-800 font-normal hover:text-gray-900 hover:border-blue-500 border-b border-dashed border-blue-300"
-            >
-              Unlimited SaaS development
-            </a>{' '}
-            service.
+            .
           </p>
-          <p className="text-lg leading-7 text-gray-500 mt-6">
+          {/* <p className="text-lg leading-7 text-gray-500 mt-6">
             This is my personal blog where I talk about some SaaS challenges I've come across, and
-            how I overcame them.
-          </p>
+            how I overcame them. 
+          </p> */}
         </div>
         <div className="mt-8 lg:mt-0 lg:ml-8">
           {/* <form className="sm:flex" action={url}>

@@ -28,10 +28,7 @@ export default function Header() {
           className="font-medium text-gray-500 hover:text-gray-700"
         >
           <div className="flex space-x-2 items-center">
-            <div>
-              <span className="md:hidden">Products</span>
-              <span className="hidden md:block">Products & Services</span>
-            </div>
+            <div>My SaaS kits</div>
             <img
               className="h-4 w-4"
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAC0ElEQVRIic2VX2jWZRTHP+f5/cb2PK8MXJJuTmFRGBTMXdhFGHThnwRF8MILI1BESsJKwnJC8BKomIPBFP+wLhSCLLWuIrGbwSRwXZQsiRBUJIyM5k3o3v2e5xwv3tdtKttrbkLn5jy/c85zznOe8/19H2EW5aedK54rFcVXTSku8VZ8seDY0LsC0Ha8Z15zMbbDa1oSNLlgBT5FSinhtcBbJKSETwUljXirrkOKeE2UavE+xc6gadAX8VCg+DZo+iBv6etrzlNlCJGO6jkM7L4yrGbCjIllLaZmMRt3g9nxjpHWX/9qufE3aEvuGuNalA5M+s04KCbJJJFywY0qgkOdkhUOh2EuQ11BFjOQiGU5eYw4SSDShXDy2rybu4Nyc7ShciZ3uIWQAD33y/ufXJnhGK5eeufVQTNZPN/iJTlyuchnmPAR6Tz24y3g1v1vN9sFHpanXqDuFW3dv/P5Jh3rDim+5DXmQSNeq7AN4xB+wHYnpHihJA37nj0y8O+0Bd488FG7aWUImPuo1x5QE3gGg9dSutMFrJm2gFraZDBXRD4uaWtPuVzWeh1f2/x6k3k7J8gb/2xZtqjeDNoARGXgcZIDdJwYGDXkZ4C8Qdv+3ygql8t1908bYGK3AZKkFx/29Xdv3PvC3eG73+xaf/37D9ctnyrHtEMWszNAtyAnd3369l6vcawGU7EUn1H0FcRWCXoYWPqfO/hyd+9lM7dSTM4DY5NcmWCjjeTXxdxVYM4TdQBwYk/vILB6ss1APt+z8WyB/pljZsLWqfY/0ZAFbNu+rzeouS5yt3hNz3enpoqdEZu+9dnp3+vFPP3/wIwRAMMtmq2kYtJe1dltaenva58TK78FjY0+xeGgyYIV+BgJNaYMmgipoEkjj8GmjT7Fl4PG4fmtF5fmI9ve+6P56MF1hvQCnWDZZIasvv828caPy5RsWkH4QSzbLmX0HkjybcXIT92rAAAAAElFTkSuQmCC"
