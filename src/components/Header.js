@@ -23,20 +23,27 @@ export default function Header() {
       </div>
       <div className="text-base leading-5 flex space-x-4">
         <a
-          target="_blank"
-          href="https://alexandromg.gumroad.com/"
-          className="font-medium text-gray-500 hover:text-gray-700"
+          href="https://github.com/AlexandroMtzG?tab=repositories"
+          className="font-medium text-gray-700 hover:text-gray-900"
         >
           <div className="flex space-x-2 items-center">
-            <div>My SaaS kits</div>
-            <img
-              className="h-4 w-4"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAC0ElEQVRIic2VX2jWZRTHP+f5/cb2PK8MXJJuTmFRGBTMXdhFGHThnwRF8MILI1BESsJKwnJC8BKomIPBFP+wLhSCLLWuIrGbwSRwXZQsiRBUJIyM5k3o3v2e5xwv3tdtKttrbkLn5jy/c85zznOe8/19H2EW5aedK54rFcVXTSku8VZ8seDY0LsC0Ha8Z15zMbbDa1oSNLlgBT5FSinhtcBbJKSETwUljXirrkOKeE2UavE+xc6gadAX8VCg+DZo+iBv6etrzlNlCJGO6jkM7L4yrGbCjIllLaZmMRt3g9nxjpHWX/9qufE3aEvuGuNalA5M+s04KCbJJJFywY0qgkOdkhUOh2EuQ11BFjOQiGU5eYw4SSDShXDy2rybu4Nyc7ShciZ3uIWQAD33y/ufXJnhGK5eeufVQTNZPN/iJTlyuchnmPAR6Tz24y3g1v1vN9sFHpanXqDuFW3dv/P5Jh3rDim+5DXmQSNeq7AN4xB+wHYnpHihJA37nj0y8O+0Bd488FG7aWUImPuo1x5QE3gGg9dSutMFrJm2gFraZDBXRD4uaWtPuVzWeh1f2/x6k3k7J8gb/2xZtqjeDNoARGXgcZIDdJwYGDXkZ4C8Qdv+3ygql8t1908bYGK3AZKkFx/29Xdv3PvC3eG73+xaf/37D9ctnyrHtEMWszNAtyAnd3369l6vcawGU7EUn1H0FcRWCXoYWPqfO/hyd+9lM7dSTM4DY5NcmWCjjeTXxdxVYM4TdQBwYk/vILB6ss1APt+z8WyB/pljZsLWqfY/0ZAFbNu+rzeouS5yt3hNz3enpoqdEZu+9dnp3+vFPP3/wIwRAMMtmq2kYtJe1dltaenva58TK78FjY0+xeGgyYIV+BgJNaYMmgipoEkjj8GmjT7Fl4PG4fmtF5fmI9ve+6P56MF1hvQCnWDZZIasvv828caPy5RsWkH4QSzbLmX0HkjybcXIT92rAAAAAElFTkSuQmCC"
-            />
+            <div>My repos</div>
+            <svg
+              className="h-5 w-5 "
+              xmlns="http://www.w3.org/2000/svg"
+              x="0px"
+              y="0px"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M10.9,2.1c-4.6,0.5-8.3,4.2-8.8,8.7c-0.5,4.7,2.2,8.9,6.3,10.5C8.7,21.4,9,21.2,9,20.8v-1.6c0,0-0.4,0.1-0.9,0.1 c-1.4,0-2-1.2-2.1-1.9c-0.1-0.4-0.3-0.7-0.6-1C5.1,16.3,5,16.3,5,16.2C5,16,5.3,16,5.4,16c0.6,0,1.1,0.7,1.3,1c0.5,0.8,1.1,1,1.4,1 c0.4,0,0.7-0.1,0.9-0.2c0.1-0.7,0.4-1.4,1-1.8c-2.3-0.5-4-1.8-4-4c0-1.1,0.5-2.2,1.2-3C7.1,8.8,7,8.3,7,7.6C7,7.2,7,6.6,7.3,6 c0,0,1.4,0,2.8,1.3C10.6,7.1,11.3,7,12,7s1.4,0.1,2,0.3C15.3,6,16.8,6,16.8,6C17,6.6,17,7.2,17,7.6c0,0.8-0.1,1.2-0.2,1.4 c0.7,0.8,1.2,1.8,1.2,3c0,2.2-1.7,3.5-4,4c0.6,0.5,1,1.4,1,2.3v2.6c0,0.3,0.3,0.6,0.7,0.5c3.7-1.5,6.3-5.1,6.3-9.3 C22,6.1,16.9,1.4,10.9,2.1z"></path>
+            </svg>
           </div>
         </a>
         {/* <a
-          target="_blank"
+          
           href="https://www.getrevue.co/profile/alexandromtzg"
           className="font-medium text-gray-500 hover:text-gray-700"
         >
@@ -55,7 +62,6 @@ export default function Header() {
         </a> */}
 
         <a
-          target="_blank"
           href="https://twitter.com/alexandromtzg"
           className="font-medium text-blue-500 hover:text-blue-700 truncate"
         >

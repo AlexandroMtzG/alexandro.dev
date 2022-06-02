@@ -40,7 +40,7 @@ export default function Newsletter({ url }) {
         <div className="lg:w-0 lg:flex-1">
           {/* <h2 className="text-lg font-extrabold text-gray-900">Get notified</h2> */}
           <p className="text-lg leading-7 text-gray-500 mt-3">
-            I'm Alexandro Martínez, a full-stack dev building{' '}
+            I'm Alex 👋, currently building{' '}
             {/* <button
               onClick={next}
               // target="_blank"
@@ -49,15 +49,14 @@ export default function Newsletter({ url }) {
             >
               {names[i].title}
             </button> */}
-            a{' '}
             <a
-              href="https://alexandromg.gumroad.com/l/SaasFrontends-Remix"
+              href="https://saasrock.com"
               target="_blank"
               className="text-gray-800 font-normal hover:text-gray-900 hover:border-blue-500 border-b border-dashed border-blue-300"
             >
-              Remix SaaS starter kit
-            </a>{' '}
-            built with{' '}
+              SaasRock - The Remix SaaS kit
+            </a>
+            , built with{' '}
             <a
               target="_blank"
               href="https://remix.run/"
@@ -68,20 +67,20 @@ export default function Newsletter({ url }) {
             ,{' '}
             <a
               target="_blank"
-              href="https://reactjs.org/"
-              className="text-gray-800 font-normal hover:text-gray-900 hover:border-blue-500 border-b border-dashed border-blue-300"
-            >
-              {' '}
-              React
-            </a>
-            ,{' '}
-            <a
-              target="_blank"
               href="https://tailwindcss.com"
               className="text-gray-800 font-normal hover:text-gray-900 hover:border-teal-500 border-b border-dashed border-teal-300"
             >
               {' '}
               Tailwind CSS
+            </a>
+            , and{' '}
+            <a
+              target="_blank"
+              href="https://prisma.io"
+              className="text-gray-800 font-normal hover:text-gray-900 hover:border-teal-500 border-b border-dashed border-teal-300"
+            >
+              {' '}
+              Prisma
             </a>
             .
           </p>

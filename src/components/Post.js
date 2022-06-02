@@ -98,10 +98,10 @@ export default function Post({ meta, children, posts }) {
               >
                 Twitter
               </a>{' '}
-              or subscribe to my{' '}
+              or subscribe to the{' '}
               <a
                 target="_blank"
-                href="https://www.getrevue.co/profile/alexandromtzg"
+                href="https://saasrock.com/newsletter"
                 className="font-medium text-purple-500 hover:text-purple-600"
               >
                 Newsletter

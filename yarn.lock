@@ -1980,6 +1980,25 @@
   "resolved" "https://registry.npmjs.org/check-types/-/check-types-8.0.3.tgz"
   "version" "8.0.3"
 
+"chokidar@^2.1.8", "chokidar@2.1.8":
+  "integrity" "sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg=="
+  "resolved" "https://registry.npmjs.org/chokidar/-/chokidar-2.1.8.tgz"
+  "version" "2.1.8"
+  dependencies:
+    "anymatch" "^2.0.0"
+    "async-each" "^1.0.1"
+    "braces" "^2.3.2"
+    "glob-parent" "^3.1.0"
+    "inherits" "^2.0.3"
+    "is-binary-path" "^1.0.0"
+    "is-glob" "^4.0.0"
+    "normalize-path" "^3.0.0"
+    "path-is-absolute" "^1.0.0"
+    "readdirp" "^2.2.1"
+    "upath" "^1.1.1"
+  optionalDependencies:
+    "fsevents" "^1.2.7"
+
 "chokidar@^3.3.0":
   "integrity" "sha512-aXAaho2VJtisB/1fg1+3nlLJqGOuewTzQpd/Tz0yTg2R0e4IGtshYvtjowyEumcBv2z+y4+kc75Mz7j5xJskcQ=="
   "resolved" "https://registry.npmjs.org/chokidar/-/chokidar-3.4.0.tgz"
@@ -2008,25 +2027,6 @@
     "is-glob" "~4.0.1"
     "normalize-path" "~3.0.0"
     "readdirp" "~3.4.0"
-
-"chokidar@2.1.8":
-  "integrity" "sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg=="
-  "resolved" "https://registry.npmjs.org/chokidar/-/chokidar-2.1.8.tgz"
-  "version" "2.1.8"
-  dependencies:
-    "anymatch" "^2.0.0"
-    "async-each" "^1.0.1"
-    "braces" "^2.3.2"
-    "glob-parent" "^3.1.0"
-    "inherits" "^2.0.3"
-    "is-binary-path" "^1.0.0"
-    "is-glob" "^4.0.0"
-    "normalize-path" "^3.0.0"
-    "path-is-absolute" "^1.0.0"
-    "readdirp" "^2.2.1"
-    "upath" "^1.1.1"
-  optionalDependencies:
-    "fsevents" "^1.2.7"
 
 "chownr@^1.1.1", "chownr@^1.1.2":
   "integrity" "sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg=="
@@ -6786,6 +6786,13 @@
   "integrity" "sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ=="
   "resolved" "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz"
   "version" "1.1.2"
+
+"watchpack-chokidar2@^2.0.0":
+  "integrity" "sha512-9TyfOyN/zLUbA288wZ8IsMZ+6cbzvsNyEzSBp6e/zkifi6xxbl8SmQ/CxQq32k8NNqrdVEVUVSEf56L4rQ/ZxA=="
+  "resolved" "https://registry.npmjs.org/watchpack-chokidar2/-/watchpack-chokidar2-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "chokidar" "^2.1.8"
 
 "watchpack@^1.6.1":
   "integrity" "sha512-ymVbbQP40MFTp+cNMvpyBpBtygHnPzPkHqoIwRRj/0B8KhqQwV8LaKjtbaxF2lK4vl8zN9wCxS46IFCU5K4W0g=="
