@@ -27,9 +27,9 @@ export default function Header() {
           className="font-medium text-gray-700 hover:text-gray-900"
         >
           <div className="flex space-x-2 items-center">
-            <div>My repos</div>
+            <div className="hidden sm:block">Open source</div>
             <svg
-              className="h-5 w-5 "
+              className="h-7 w-7 sm:h-5 sm:w-5"
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
               y="0px"
@@ -42,16 +42,15 @@ export default function Header() {
             </svg>
           </div>
         </a>
-        {/* <a
-          
-          href="https://www.getrevue.co/profile/alexandromtzg"
-          className="font-medium text-gray-500 hover:text-gray-700"
+        <a
+          href="https://saasrock.com/newsletter"
+          className="font-medium text-teal-500 hover:text-teal-700"
         >
           <div className="flex space-x-2 items-center">
-            <div>Newsletter</div>
+            <div className="hidden sm:block">Newsletter</div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
+              className="h-7 w-7 sm:h-5 sm:w-5"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -59,14 +58,14 @@ export default function Header() {
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
             </svg>
           </div>
-        </a> */}
+        </a>
 
         <a
           href="https://twitter.com/alexandromtzg"
           className="font-medium text-blue-500 hover:text-blue-700 truncate"
         >
           <div className="flex space-x-2 items-center">
-            <div>Follow me</div>
+            <div className="hidden sm:block">Follow me</div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
@@ -74,7 +73,7 @@ export default function Header() {
               width="30"
               height="30"
               viewBox="0 0 30 30"
-              className="h-5 w-5"
+              className="h-7 w-7 sm:h-5 sm:w-5"
               fill="currentColor"
             >
               {' '}

@@ -40,7 +40,7 @@ export default function Newsletter({ url }) {
         <div className="lg:w-0 lg:flex-1">
           {/* <h2 className="text-lg font-extrabold text-gray-900">Get notified</h2> */}
           <p className="text-lg leading-7 text-gray-500 mt-3">
-            I'm Alex 👋, currently building{' '}
+            I'm Alexandro 👋, currently building{' '}
             {/* <button
               onClick={next}
               // target="_blank"
@@ -54,9 +54,9 @@ export default function Newsletter({ url }) {
               target="_blank"
               className="text-gray-800 font-normal hover:text-gray-900 hover:border-blue-500 border-b border-dashed border-blue-300"
             >
-              SaasRock - The Remix SaaS kit
-            </a>
-            , built with{' '}
+              SaasRock
+            </a>{' '}
+            - a multi-tenant framework for SaaS apps, built with{' '}
             <a
               target="_blank"
               href="https://remix.run/"
@@ -82,7 +82,15 @@ export default function Newsletter({ url }) {
               {' '}
               Prisma
             </a>
-            .
+            .{' '}
+            <a
+              target="_blank"
+              href="https://alexandromg.gumroad.com/l/SaasRock"
+              className="text-gray-800 font-normal hover:text-gray-900 hover:border-teal-500 border-b border-dashed border-teal-300"
+            >
+              Get it
+            </a>{' '}
+            before v1 launches 🚀.
           </p>
           {/* <p className="text-lg leading-7 text-gray-500 mt-6">
             This is my personal blog where I talk about some SaaS challenges I've come across, and
