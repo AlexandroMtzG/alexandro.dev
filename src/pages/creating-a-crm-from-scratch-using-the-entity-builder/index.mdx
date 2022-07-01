@@ -1,0 +1,199 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Creating a CRM from scratch using SaasRock’s Entity Builder',
+  category: 'Article',
+  description: `I’ll write about the steps I take as I’m creating my own CRM for SaasRock’s core.`,
+  date: '2022-07-01T16:14:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+I’ll write about the steps I take as I’m creating my own CRM for [SaasRock](http://saasrock.com/)’s core.
+
+I’m going to use its [Entity Builder](https://saasrock.com/docs/features/entity-builder), and add everything I need on the fly.
+
+<img src={image} alt="Creating a CRM from scratch using SaasRock’s Entity Builder" />
+
+<!--more-->
+
+The only thing I know about CRM is its goal: _**managing relationships**_.
+
+Let’s start by exploring popular CRM solutions to find out the core structure for an actual CRM.
+
+---
+
+# 1. Research — Existing CRM tools
+
+According to [Zapier](https://zapier.com/blog/best-crm-app/), [Pipedrive](https://www.pipedrive.com/es) is one of the best CRM apps. So I went ahead and created an account.
+
+![Pipedrive](https://miro.medium.com/max/1400/1*wY6jd2_5jb3hS-JM7ujaqg.png)
+
+And now let’s see how [Freshsales](https://www.freshworks.com/crm/sales/) lists deals:
+
+![Freshsales](https://miro.medium.com/max/1400/1*p9X9Vd0HAfYdPuzD2LzcIg.png)
+
+# 2. Core Models — Contacts & Deals
+
+Right from the start, I’m able to conclude that we need 2 models:
+
+- **Contact**: Email, Name, Phone, Company, Title, and Status _(Lead, Prospect, Customer, Partner…)_.
+- **Deal**: Contact, Name, Value, and Status _(Open, Won, Lost)_.
+
+Deal statuses should be customizable since companies must have their own sales processes, so I’ll use the SaasRock’s [Entity Builder](https://saasrock.com/docs/features/entity-builder) to define their properties.
+
+A **_Status_** would determine **WHAT’s** the next action and **WHO** is responsible for it, and **WHEN** it should be done.
+
+What, Who and When sound like a **Workflow** more than a simple status field, so let’s keep that in mind.
+
+# 3. List Views — Table or Kanban & Filters
+
+We can use a table for Contacts:
+
+![Contacts Table](https://miro.medium.com/max/1400/1*YP1CBaacamdJmqIrtoniAg.png)
+
+This view looks too plain, it needs a way to filter specific things, such as **_“Lead”_** status, so I went ahead and created a _Filter mechanism_:
+
+![Table Filters](https://miro.medium.com/max/1400/1*cgw4iuNMUB2FwMPSGGFSeA.png)
+
+And **Deals** should not have a **_Table view_**:
+
+![Deals Table](https://miro.medium.com/max/1400/1*5tF-i5Py9G1BFHBL5EZm-A.png)
+
+But a **_Kanban view_**:
+
+![Deals Kanban Board](https://miro.medium.com/max/1400/1*2lfFmwvzivytSRdUGFcuPQ.png)
+
+I documented this process with a few tweets:
+
+{% twitter 1540792161897041920 %}
+
+{% twitter 1541516946440585216 %}
+
+# 4. Workflow — Deal Stages
+
+I could keep the **Deal**.**_Status_** field as a simple text field, but making the status as a workflow status could give us a couple of benefits:
+
+- Add custom workflow states
+- Assign to people on status change
+- Send emails on status change
+- Create and assign predefined tasks
+
+Since I’m building the CRM on top of my Remix SaaS boilerplate, SaasRock, I’ll use the Entity Builder to create Contacts and Deals. As of right now, Workflows have not been implemented:
+
+![Entity Workflow — In construction](https://miro.medium.com/max/1400/1*hAcSDGP_5sUhkGHMvO-rQg.png)
+
+So let’s build a Workflows engine from scratch as well, we need the following database models:
+
+- **WorkflowState**: Title and Internal Status _(Draft, Pending, Completed or Cancelled)_.
+- **WorkflowStep**: From state, To state, and an Action title.
+- **WorkflowStepAssignee**: Who to assign when reaching a certain Step _(Current Tenant?, Roles?, Groups?, Users?)_.
+
+Starting from the UI, it would look something like this:
+
+![Deal Workflow States](https://miro.medium.com/max/1400/1*wnNV1nKUeJO6jc1t0KWR8g.png)
+
+And Steps:
+
+![Deal Workflow Steps](https://miro.medium.com/max/1400/1*RzPNnldIE2QwT9kbT-yJWA.png)
+
+# 5. Row Details View
+
+Since I want to build CRM entities on top of the Entity Builder, I’ll need to make some changes there first. Currently, there are 3 elements on the _Edit Row View_:
+
+- **Details**: Property fields
+- **Actions**: Share, Update and Delete
+- **Activity**: Row events
+
+![Employees Row View](https://miro.medium.com/max/1400/1*x1Nlc5MTgMCYnQZJbZEkSA.png)
+
+I need to add:
+
+- **Tags**: New property type for colorful tags
+- **Tasks**: Ability to assign tasks to other members
+- **Comments**: A simple comment mechanism for every row
+- **Workflow Steps**: Actions to send the row to a new state
+
+## 5.1. Comments
+
+First things first: Let’s add Tags, Comments, and Tasks.
+
+I grouped **Events/Logs** and **Comments** into an _Activity section_:
+
+![Entity Row Comments](https://miro.medium.com/max/1400/1*27Fn6HfGmc5DNJ12tWCAsw.png)
+
+I made a demo about this functionality:
+
+[![Custom Entity Row Comments Preview - SaasRock](https://cdn.loom.com/sessions/thumbnails/aebc3f11cf9848e7b94d0b3712b8abd9-1656474399998-with-play.gif)](https://www.loom.com/share/aebc3f11cf9848e7b94d0b3712b8abd9|)
+
+I created a [Postmark](https://postmarkapp.com/) template _**“comment-notification”**_ so the Row creator can receive emails for every comment. We’ll leave email notification preferences for another time.
+
+![Comment Email Notification](https://miro.medium.com/max/1400/1*rGqJkkw24cAGeQWQmwraFQ.png)
+
+## 5.2. Tags
+
+Now we want to Create and Update Entity Tags and set them to Rows. Here’s what an empty state would look like:
+
+![Row Tags Empty State](https://miro.medium.com/max/1400/1*CTnladNJukm8qB0yUrVNvA.png)
+
+And here’s the Row Tags route/modal.
+
+![Employee Tags Modal](https://miro.medium.com/max/1400/1*jnk-HA4heXBzwJYlJYQEWw.png)
+
+## 5.3. Tasks
+
+Now, I’ll build the _RowTask_ model with user assignment in mind, but right now a simple implementation is fine:
+
+![Employee Tasks](https://miro.medium.com/max/1400/1*S4lgmyRpePSGDnfmgw2afA.png)
+
+## 5.4. Workflow State and Transitions
+
+Let’s use the **WorkflowState** and **WorkflowStep** models, I’ll leave **WorkflowStepAssignee** for another post.
+
+When a Row is created, it should be set to the first Workflow State that we created, Draft is the default. When Rows are Drafts, we should have only one action _(Submit)_:
+
+![Employee Workflow Steps](https://miro.medium.com/max/1400/1*FOuAcO2wr0vaV0U4jkywAw.png)
+
+So every row _(that has Workflows enabled)_, will have this "Submit" action:
+
+![Submit Workflow Step](https://miro.medium.com/max/1400/1*mghjHZRlN7q0s9fOrMPHHQ.png)
+
+And when the **Submit** action is performed, the new state should be Pending, which has 3 possible actions:
+
+![Recall, Accept and Reject Workflow Transitions](https://miro.medium.com/max/1400/1*bAEVjzxiApN_3G2yh2eHnQ.png)
+
+- **Recall** → Sends row to back to Draft
+- **Accept** → Completes the workflow
+- **Reject** → Cancels the workflow
+
+And whenever a _Row_ reaches its end, it should not have any more actions, but it should show the final _State_:
+
+![Row Workflow End — Completed State](https://miro.medium.com/max/1400/1*LZPg8PpJxs2N1hf84kuUYQ.png)
+
+With every workflow action/step performed, there should be an audit trail:
+
+![Row Activity
+](https://miro.medium.com/max/1400/1*ry-tXzf1_ocyQfaeFofnZg.png)
+
+## 5.5. Row Details View — Final result
+
+I posted a 10-min video about these features:
+
+{% twitter 1542300905944522752 %}
+
+# 6. Contacts and Deals using the Entity Builder
+
+[SaasRocks](https://saasrock.com/)’s main goal is to build SaaS applications faster than ever using its Entity Builder, so it would make sense that the CRM is built on top of it.
+
+Watch the end result here:
+
+{% youtube gErrqmGv1tw %}
+
+---
+
+## Conclusion
+
+I know that this is the world’s simplest CRM, but it’s a good start and the Entity Builder got stronger.
+
+Let me know what should I add for the next iteration of the CRM!
