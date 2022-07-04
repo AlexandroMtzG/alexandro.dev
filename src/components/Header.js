@@ -23,7 +23,7 @@ export default function Header() {
       </div>
       <div className="text-base leading-5 flex space-x-4">
         <a
-          href="https://github.com/AlexandroMtzG?tab=repositories"
+          href="https://github.com/AlexandroMtzG"
           className="font-medium text-gray-700 hover:text-gray-900"
         >
           <div className="flex space-x-2 items-center">
