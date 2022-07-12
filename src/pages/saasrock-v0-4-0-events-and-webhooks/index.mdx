@@ -1,0 +1,62 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'SaasRock v0.4.0 - Events and Webhooks',
+  category: 'Article',
+  description: `Use the Events to log essential data and use Webhooks to customize your business logic within internal or external webhooks.`,
+  date: '2022-07-11T21:34:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Use the Events to log essential data and use Webhooks to customize your business logic within internal or external webhooks.
+
+Check out v0.4.0 → [saasrock.com](http://saasrock.com).
+
+<img src={image} alt="SaasRock v0.4.0 - Events and Webhooks" />
+
+<!--more-->
+
+SaasRock has a new **EPIC** feature on the latest release: Events ⚡ Webhooks.
+
+## Every event:
+
+- Is something **important** that happened within your SaaS.
+- Is called inside a [Remix](https://remix.run/) **action**.
+- Has a **DTO** for **TypeScript** support.
+- Can call 0, 1 or more **Webhook** Endpoints (internal or external).
+
+## Use cases:
+
+- Custom **business logic** when something happens.
+- Call a Webhooks by [Zapier](https://zapier.com/).
+
+## Events and Webhooks Admin UI:
+
+Events table with filters, pagination and interactive event rows:
+
+![Events Table](https://miro.medium.com/max/1400/0*5FoiETcuL9Uxg6kV.png)
+
+Event details with **Webhook Attempts** requests and responses:
+
+![Event Details Route](https://miro.medium.com/max/1400/0*CvVj6Yf6gvlqbrST.png)
+
+---
+
+[Click here](https://www.youtube.com/watch?v=YLw_6Lb0Bqg) to watch the full demo.
+
+## SaasRock Core 🪨:
+
+- **5** Application events + Internal Webhooks.
+- **/admin/events** route with permissions (Super Admin, Auditor, - Developer).
+- Engine ready → Highly **customizable**.
+- Subscribe to [SaasRock](http://saasrock.com/) to get this [release](https://github.com/AlexandroMtzG/saasrock/releases/tag/0.4.0).
+
+## SaasRock Enterprise 🚀:
+
+- **40** Application events
+- **Custom** Webhook endpoints
+- **Retry** Webhook attempt
+- ?? **Admin** events (upcoming)
+- **/app/:tenant/settings/events** route with permissions
