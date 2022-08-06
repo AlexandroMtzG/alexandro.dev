@@ -1,0 +1,122 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'How I built a SaaS in 10 days using SaasRock',
+  category: 'Article',
+  description: `July’s goal was to build in public an actual SaaS to validate SaasRock as a production-ready SaaS starter, and to launch my own SaaS.`,
+  date: '2022-08-05T20:27:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+July's goal was to [build in public](https://twitter.com/saas_rock/status/1554157251753025537) an actual SaaS for 2 reasons:
+
+- Validate [SaasRock](http://saasrock.com/) as a production-ready SaaS starter
+- Launch my own SaaS
+
+<img src={image} alt="How I built a SaaS in 10 days using SaasRock" />
+
+<!--more-->
+
+## The problem
+
+In Mexico, there are already a lot of invoicing platforms _([QuickBooks](https://quickbooks.intuit.com/), [CONTPAQi](https://www.contpaqi.com/), [Aspel](https://www.aspel.com.mx/)…)_, but none are **simple** and **robust** at the same time, and there's not a single platform that offers taxpayers the service to generate invoices for their receipts.
+
+## The solution
+
+I called it Factura.so, like Notion.so, but with **Factura** _(Invoice in Spanish)_.
+It has 2 main features:
+
+- Forward all your invoices to yourcompany@factura.so
+- Submit your receipts and we'll generate the invoice for you
+
+With these 2 features, the headline became:
+
+> [Factura.so](https://factura.so/) - The only platform you need to request and receive invoices.
+
+## How I built it
+
+I documented my journey in a youtube series called **"Building a SaaS with SaasRock"**. Here's the summary of each video, or [click here](https://saasrock.com/tutorials/building-a-saas-with-saasrock) to view them all.
+
+- [Day 1 - Setup and Taxpayer Model](https://www.youtube.com/watch?v=FyQvTxyl7LI)
+- [Day 2 - Postmark, Supabase, and ngrok](https://www.youtube.com/watch?v=GBNe8xm6FRo)
+- [Day 3 - Custom routes for List view and New form](https://www.youtube.com/watch?v=8LFbl0uuDO8)
+- [Day 4 - Custom Workflow Logic & Custom Overview Route](https://www.youtube.com/watch?v=isaUr_YxRmE)
+- [Day 5 - Email Attachments to XML rows & Retry Webhook Attempts](https://www.youtube.com/watch?v=iyR3q5jO2aw)
+- [Day 6 - Receipts entity with related Taxpayer and XML entities](https://www.youtube.com/watch?v=W-EhIL4t0sk)
+- [Day 7 - Plan Limits, ZIP file extractions & Landing Page](https://www.youtube.com/watch?v=zGQBkUp182A)
+- [Day 8 & 9 - Final touches and Upcoming Features](https://www.youtube.com/watch?v=bddTmhp0uYo)
+- [Day 10 - Launch Day!](https://www.youtube.com/watch?v=tGeJTxEt_9k)
+
+## The code
+
+Up to day 7, the code is available for [SaasRock Enterprise](https://alexandromg.gumroad.com/l/SaasRock?tier=Enterprise%20%F0%9F%9A%80) subscribers.
+
+---
+
+## The end result
+
+### Landing page
+
+I need to communicate that with this platform, you could **Request** and **Receive** invoices, hence the emphasis:
+
+![Landing page](https://cdn-images-1.medium.com/max/1600/1*xN6pAZsmJHiWeAqZ2Cw_dw.png)
+
+### Dashboard
+
+3 blocks here:
+
+- **Summary**: All my XMLs, Receipts, and Invoices _(from 30 days to date)_.
+- **Receipts**: Stats by workflow state _(Pending, Invalid, or Processed)_.
+- **XMLs**: The SaaS is around XMLs, so it makes sense to show the last 10.
+
+![Dashboard](https://cdn-images-1.medium.com/max/1600/1*ZqbKGyz4b1oU684Czgo5FQ.png)
+
+### My Receipts
+
+Using SaasRock's Entity Builder I created 3 views:
+
+- **Pending**: A table of _pending_ receipts
+- **All**: A table of _all_ receipts
+- **Photos**: A grid of _all_ receipt photos
+
+![My Receipts](https://cdn-images-1.medium.com/max/1600/1*TbP8Y_NpX6IsBpDznIcBHw.png)
+
+### My XMLs
+
+XMLs can be created:
+
+- **Manually**: User uploads an **.xml** file
+- **Email**: Send or forward emails with **.xml** files to _yourcompany@factura.so_
+- **Sync**: By adding a Taxpayer Credential _(see My Invoices)_.
+
+![My XMLs](https://cdn-images-1.medium.com/max/1600/1*APhX-GmAHA6zgI3hkULGGw.png)
+
+### My Invoices
+
+If a user uploaded their Taxpayer Credential, I sync their invoices with the [SAT.WS](http://sat.ws/) API:
+
+![My Invoices](https://cdn-images-1.medium.com/max/1600/1*1CX6HFJTE4wLsiVWtktnNg.png)
+
+### My Emails
+
+SaasRock comes with an out-of-the-box inbound emails feature, I use it to create XML Entity Rows if there are attachments of type **.xml** and **.pdf**.
+
+![My Emails](https://cdn-images-1.medium.com/max/1600/1*VTtGuSChNP_FyMieZViYBA.png)
+
+### My Subscription (prices in MXN)
+
+The business model is simple:
+
+- **Test**: A freemium plan to test all the main features
+- **Essential**: For small companies
+- **Business**: For medium/large companies
+
+![My Subscription](https://cdn-images-1.medium.com/max/1600/1*0XY9nqa53q0JRsTjQIhHLQ.png)
+
+## What's Next for SaasRock?
+
+Right now I have post-launch depression, where I don't know what I'm going to do next 🤣. But I have written down some ideas:
+
+![What's Next for SaasRock](https://cdn-images-1.medium.com/max/1600/1*UuyONoTBA-iKjGBHO22dWg.png)
