@@ -20,9 +20,9 @@ Check out v0.5.0 → [enterprise.saasrock.com](http://enterprise.saasrock.com).
 
 ## Cookie Consent 🍪 - Core feature 🪨
 
-A lot of third-party tools use cookies to store private user data, and that could break compliance rules in some countries _(and we don't like being tracked)_.
+Many third-party tools use cookies to store private user data, which could break compliance rules in some countries _(and we don't like being tracked)_ if the user did not give consent.
 
-SaasRock's v0.5.0 comes with a cookie banner + settings that ask your users to allow the website cookie usage, and their purpose.
+SaasRock's v0.5.0 comes with a cookie banner + settings that ask your users to allow the website cookie usage and their purpose.
 
 ### Cookie Banner
 
@@ -38,7 +38,7 @@ If the user wishes to inspect each cookie, they can open the cookie settings mod
 
 ### Usage
 
-Ever time you add a new cookie information, it will ask the user to allow _(or deny)_ it.
+Ever time you add a new cookie detail, it will ask the user to allow _(or deny)_ it.
 
 Here are the initial **Cookie Categories** at `app/application/cookies/CookieCategory.ts`:
 
@@ -52,7 +52,7 @@ Now, you can check for cookie consent. Let's see how we can set the Google Analy
 
 ![Google Analytics](https://cdn-images-1.medium.com/max/1600/1*3AwWviL85Vh2dSUUrXErBg.png)
 
-I'm using the function _CookieHelper.hasConsent(...)_ by passing the current **user session** and the **cookie category**. This function can be used both on the backend _(loaders and actions)_ and on the frontend _(React components)_.
+I'm using the function _CookieHelper.hasConsent(...)_ by passing the current **user session** and the **cookie category**. This function can be used on the backend _(loaders and actions)_ and on the frontend _(React components)_.
 
 ## Built-in Analytics 📈 - Enterprise feature 🚀
 
