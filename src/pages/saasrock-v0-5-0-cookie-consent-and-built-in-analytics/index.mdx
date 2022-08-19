@@ -1,0 +1,119 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'SaasRock v0.5.0 - Cookie consent and built-in Analytics',
+  category: 'Article',
+  description: `Let your users know the cookies used on your site, and track their page views and events with the built-in analytics Enterprise feature.`,
+  date: '2022-08-19T21:34:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Let your users know the cookies used on your site, and track their page views and events with the built-in analytics Enterprise feature.
+
+Check out v0.5.0 → [enterprise.saasrock.com](http://enterprise.saasrock.com).
+
+<img src={image} alt="SaasRock v0.5.0 - Cookie consent and built-in Analytics" />
+
+<!--more-->
+
+## Cookie Consent 🍪 - Core feature 🪨
+
+A lot of third-party tools use cookies to store private user data, and that could break compliance rules in some countries _(and we don't like being tracked)_.
+
+SaasRock's v0.5.0 comes with a cookie banner + settings that ask your users to allow the website cookie usage, and their purpose.
+
+### Cookie Banner
+
+A banner will show up at every page until the user selects its preferences.
+
+![Cookie Banner](https://user-images.githubusercontent.com/8606530/185702794-ffca8aa9-11cc-47d9-8c77-52902e224aa0.png)
+
+### Cookie Settings
+
+If the user wishes to inspect each cookie, they can open the cookie settings modal.
+
+![Cookie Settings](https://user-images.githubusercontent.com/8606530/185702743-ede6850b-1258-4c84-b9a3-491e3f944bdc.png)
+
+### Usage
+
+Ever time you add a new cookie information, it will ask the user to allow _(or deny)_ it.
+
+Here are the initial **Cookie Categories** at `app/application/cookies/CookieCategory.ts`:
+
+![Cookie Categories](https://cdn-images-1.medium.com/max/1600/1*X3oX4AebYpgKyxT2yX6XwA.png)
+
+For every cookie you'll use, add its details at `app/application/cookies/ApplicationCookies.ts`:
+
+![Application Cookies](https://cdn-images-1.medium.com/max/1600/1*93oyQOr4zewrsbm7iFVHAg.png)
+
+Now, you can check for cookie consent. Let's see how we can set the Google Analytics script at `root.tsx` inside the `body` tag - using the `ADVERTISEMENT` cookie category:
+
+![Google Analytics](https://cdn-images-1.medium.com/max/1600/1*3AwWviL85Vh2dSUUrXErBg.png)
+
+I'm using the function _CookieHelper.hasConsent(...)_ by passing the current **user session** and the **cookie category**. This function can be used both on the backend _(loaders and actions)_ and on the frontend _(React components)_.
+
+## Built-in Analytics 📈 - Enterprise feature 🚀
+
+Now that cookies are set 🍪, your site will track anonymously for page views and actions.
+
+### Why a built-in analytics solution?
+
+SaasRock does not intent to invent the wheel, there are great analytics solutions out there, both [free](https://simpleanalytics.com/) and [powerful](https://plausible.io/). But SaasRock’s main goal is to have everything you need when building SaaS applications, at least in a minimal way.
+
+But the main reason I’m starting to build a built-in analytics solution is to have a built-in **Affiliates and Referrals** program, and for that I need to identify UTM tags within SaasRock/your-SaaS _(although I know nothing about how to use them yet, so expect a lot of bugs 😅)_.
+
+### What does SaasRock store?
+
+Unlike privacy-friendly tools like [Plausible Analytics](https://plausible.io/) or [SimpleAnalytics](https://simpleanalytics.com/), SaasRock DOES use a cookie _saasrock_analytics_.
+
+But this doesn't mean that SaasRock stores private data, I tried to store on the database as few data as possible:
+
+- **Cookie**: to identify unique visitors
+- **HTTP Referrer**
+- **Browser**
+- **Operating System**: I'm using the [platform](https://github.com/bestiejs/platform.js) library
+- **UTM tags**: source, medium, campaign, content, and term
+
+SaasRock does not store the **IP** or the raw **user agent**.
+
+Here's the **AnalyticsUniqueVisitor** database ([prisma](http://prisma.io/)) model:
+
+![AnalyticsUniqueVisitor](https://cdn-images-1.medium.com/max/1600/1*RJptaI4rMaHP0Z_QtwBZ5g.png)
+
+### Analytics Admin UI
+
+**Overview** - Summary of Unique Visitors, Page Views, and Events
+
+![Overview](https://user-images.githubusercontent.com/8606530/185703088-30099646-143f-4484-a858-9bc4d60d1bfc.png)
+
+**Unique visitors**
+
+![Unique visitors](https://user-images.githubusercontent.com/8606530/185703140-1fe932ab-e895-425c-b0ee-05e345f20b45.png)
+
+**Page views**
+
+![Page views](https://user-images.githubusercontent.com/8606530/185703188-e40df302-3a75-41ea-b7bb-a16b5c3bb714.png)
+
+**Settings**
+
+![Settings](https://user-images.githubusercontent.com/8606530/185703214-993fd021-9a7f-4774-86a9-875a96e499c3.png)
+
+**Public Analytics** - You can have the analytics data publicly available.
+
+![Public Analytics
+](https://user-images.githubusercontent.com/8606530/185703243-f3667bb2-aff6-4344-8780-0da1031410e4.png)
+
+### What's next for Analytics?
+
+Of course this is _*v0.0.0.0.0.1*_ of the analytics feature, but I needed a built-in Analytics starter in order to start developing the upcoming Enterprise feature for **Affiliates and Referrals**, so I need to make sure that page views are tracked correctly.
+
+**Planned**:
+
+- Stats Charts, [like SimpleAnalytics](https://simpleanalytics.com/)
+
+**Optional**:
+
+- Use an API to identify the user's country and city with its IP.
+- I'll try to figure out how to identify unique visitors without using cookies, [like Plausible Analytics](https://plausible.io/data-policy#how-we-count-unique-users-without-cookies).
