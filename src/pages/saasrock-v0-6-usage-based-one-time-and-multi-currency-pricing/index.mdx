@@ -1,0 +1,393 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'SaasRock v0.6 - Usage-based, One-time, and Multi-currency pricing',
+  category: 'Article',
+  description: `The first release of SaasRock came with only 2 pricing models: Flat-rate and Per-seat. Soon enough I would realize 2 things: I need to support more pricing mode.`,
+  date: '2022-09-10T18:39:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+The [first release of SaasRock](https://twitter.com/AlexandroMtzG/status/1508441611428143111?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1508441611428143111%7Ctwgr%5Ed11775bf1f1414cfdaf4525404acbd2672f9297c%7Ctwcon%5Es1_&ref_url=https%3A%2F%2Fwww.indiehackers.com%2Fpost%2Ffree-remix-saas-kit-for-24-hrs-c9a2e13045) came with only 2 pricing models: [Flat-rate](https://stripe.com/docs/products-prices/pricing-models#flat-rate) and [Per-seat](https://stripe.com/docs/products-prices/pricing-models#per-seat). Soon enough I would realize 2 things: I need to support more pricing models, and that pricing is VERY complicated.
+
+This is the biggest SaasRock update since [v0.3](https://saasrock.com/changelog).
+
+<img src={image} alt="SaasRock v0.6 - Usage-based, One-time, and Multi-currency pricing" />
+
+<!--more-->
+
+I could not have built this in 2 weeks without the [SaasRock pillars](https://saasrock.com/docs/stack):
+
+- [Remix](https://remix.run/): Loaders + Actions = Quick full stack dev & fast app
+- [Stripe](https://stripe.com/en-mx): Billion-dollar payment API provider
+- [Prisma](https://www.prisma.io/): Next-generation object–relational mapper
+- [Tailwind CSS](https://tailwindcss.com/): Fast prototyping and quality designs
+
+[Get SaasRock now](https://alexandromg.gumroad.com/l/SaasRock?tier=Enterprise%20%F0%9F%9A%80) to lock-in the current price before it increases!
+
+## 1/3 - The challenge
+
+Look at some examples of what SaasRock did not support:
+
+- **Usage-based** - _0.01 x ENTITY_NAME_HERE_
+- **Flat-rate + Usage-based** - *$9/m + 0.01 x API call*
+- **One-time** - *$499 Lifetime deal or $2,000 implementation fee*
+
+Those are just pricing models, I wanted to improve the overall pricing and subscription UX:
+
+- Multi-**currency**
+- Allow for multiple **Usage-based units**, _e.g. 0.01 x API call or $2 x Contract_
+- Create an account from the `/pricing` page with Stripe Checkout Session
+- **Multiple subscriptions**, and handle each billing cycle separately
+- One-time payments create **lifetime subscriptions**
+- Enforce tenants (optionally) to have an **active subscription**
+
+As a good developer, I promised to have this ready by the end of August, and we're almost halfway through September _(but I guess this [does not only apply](https://www.youtube.com/watch?v=cBE0OPBlu_w) to software development)_.
+
+![August wrap up](https://cdn-images-1.medium.com/max/800/1*i4IWw0Vo1aDCgn4muMyhmw.png)
+
+I'm not going to lie, this was way more complicated than I anticipated, and I'm aware that even with these new features, I'm just scratching the surface in terms of pricing. No wonder why Stripe's worth is in the billions.
+
+---
+
+## 2/3 - The solution
+
+The main problem was allowing for multiple subscriptions because the previous model was designed to support one, just take a look at the models before/after diff:
+
+![New database models](https://cdn-images-1.medium.com/max/800/1*Z8GLbK7yYn64e-lxUpiVKA.png)
+
+These new models look scary, but gave me a lot of flexibility to handle:
+
+- Multiple recurring subscriptions
+- Multiple one-time payments
+- Track usage-based reported records _(more on this later)_
+- Allow for plans/products to have multiple prices, _e.g. Flat rate of $9 and Usage-based of $0.01 x Employee_
+
+### Developer Experience first
+
+The development stage when building SaaS apps is a top priority for SaasRock, so **creating**, **updating**, and **deleting** pricing plans to test all scenarios should be as simple as possible.
+
+This is the reason I built a `plans.server.ts` file with default Pricing Plans _(Basic, Starter, and Enterprise)_:
+
+- FLAT_RATE
+- PER_SEAT
+- USAGE_BASED
+- FLAT_RATE_PLUS_USAGE_BASED
+- ONE_TIME
+
+And before creating them, you can preview each pricing model that would fit your SaaS at the `/pricing` page with a `?model=` parameter.
+
+### FLAT_RATE - /pricing?model=0
+
+![FLAT_RATE](https://cdn-images-1.medium.com/max/800/1*68pLqsifIIN48iH7TKnERQ.png)
+
+### PER_SEAT - /pricing?model=1
+
+![PER_SEAT](https://cdn-images-1.medium.com/max/800/1*3sUSmq4p1QhDTmZTciemLg.png)
+
+### USAGE_BASED - /pricing?model=2
+
+![USAGE_BASED](https://cdn-images-1.medium.com/max/800/1*k9YSplZjGzOof-eWrG4Xgw.png)
+
+### FLAT_RATE_PLUS_USAGE_BASED - /pricing?model=3
+
+![FLAT_RATE_PLUS_USAGE_BASED](https://cdn-images-1.medium.com/max/800/1*bLppDIRYgori2ICpeAO6-g.png)
+
+### ONE_TIME - /pricing?model=4
+
+![ONE_TIME](https://cdn-images-1.medium.com/max/800/1*8DeoQ0x-wYrZpgwPe2Hz7w.png)
+
+Once you're somewhat happy with the plans, devs can easily generate them from `/admin/setup/pricing`:
+
+![/admin/setup/pricing](https://cdn-images-1.medium.com/max/800/1*5d3onscvYFdU6P2Jc8cvDA.png)
+
+But you can also create them one by one at `/admin/setup/pricing/new`:
+
+![New pricing plan](https://cdn-images-1.medium.com/max/800/1*vDgRFNtJLpzQ8wLDtsSV6g.png)
+
+My recommended way of doing it though, is using the `plans.server.ts` file, this way you would also have to think about your core features and their limits: _are API calls monthly? unlimited? not included?_
+
+![Plan Features & Limits](https://cdn-images-1.medium.com/max/800/1*uA9GGFJ-VzYOyfusrvaCiQ.png)
+
+_Once the plan is created, there's no way to update the price(s). This is because that's how Stripe works, and it makes sense since updating the price when there are subscribed customers would make an invoicing mess._
+
+### Usage-based pricing
+
+Charging users based on their usage requires a separate blog post on its own, but I'll try to talk about the main things.
+
+If you're a developer, I don't have to tell you why **Pay-as-you-go** gives a lot of flexibility when building software, and that [it's a trend](https://techcrunch.com/2021/11/23/inside-the-rapid-rise-of-usage-based-pricing/).
+
+Let's test with the following pricing plans, which include **_Flat rate + Usage-based_** prices:
+
+![Flat rate + Usage-based](https://cdn-images-1.medium.com/max/800/1*jQuEvVchHBiFtAzwmEM_xQ.png)
+
+Our **Starter** product, should look like this, note that I'm supporting **_USD_** and **_MXN_** currencies.
+
+![Starter Plan - Stripe Dashboard](https://cdn-images-1.medium.com/max/800/1*aE3w14Gvg9FCKTu1hBFaYw.png)
+
+The Stripe Checkout session would look like this:
+
+- Pay $199 now
+- Pay based on API calls usage at the end of the cycle
+
+![Starter Plan - Stripe Checkout Session](https://cdn-images-1.medium.com/max/800/1*naZoGKxqiYeJEhIlkoAULQ.png)
+
+The Stripe subscription will be **Active**, have two **Subscription Items**, and have an **Upcoming Invoice**.
+
+![Customer Subscription - Stripe Dashboard](https://cdn-images-1.medium.com/max/800/1*SXzc0l_eXIS0adtE2m_bqw.png)
+
+Now the fun part, let's report some usage. Since my plan will track API calls, you could follow [this guide](https://saasrock.com/docs/learning-center/guides/entities/use-the-custom-entity-api) to learn how to use the API.
+
+The first API call would give us the following response:
+
+![GET employees API call - VS Code Thunder Client](https://cdn-images-1.medium.com/max/800/1*vSO-1Mca0-Pj7Drpynnhzg.png)
+
+The Upcoming invoice will still be $199 because API calls are free until we reach 10 units:
+
+![Stripe Upcoming Invoice](https://cdn-images-1.medium.com/max/800/1*pmQtaSquzhNSl8OBJLlH9A.png)
+
+After reaching 11 units _(API calls)_, we'll reach the 2nd tier, where each unit costs $0.04 and there's a flat fee of $10:
+
+![$199 + (0.04 x 1) + $10 = $209.44](https://cdn-images-1.medium.com/max/800/1*DMDePW39B7PkZmGVvdllLQ.png)
+
+And our customer can see the **Upcoming Invoice** at `/app/:tenant/settings/subscription`:
+
+![Upcoming Invoice](https://cdn-images-1.medium.com/max/800/1*kqmsirwffLCHJW6_f7s3Rg.png)
+
+Now let's get to the 3rd tier, with 21 units _(API calls)_, where units cost $0.02 _(cheaper)_ but there's a flat fee of $20:
+
+![$199 + (0.02 x 21) + $20 = $219.42](https://cdn-images-1.medium.com/max/800/1*zcLk8VH1eqy1SUe4VN7shw.png)
+
+These examples were with VOLUME tiers, I'm going to do the following steps to try GRADUATED tiers ([read more about this here](https://stripe.com/docs/products-prices/pricing-models#usage-based-pricing)):
+
+- Cancel our subscription _(from `/app/:tenant/settings/subscription`)_
+- Run on the database: _DELETE FROM "TenantSubscriptionProduct"_
+- Run on the database: _DELETE FROM "SubscriptionProduct"_
+- Replace **"volume", "tiered"** with **"graduated", "tiered"** on `plans.server.ts`
+- Log out, log in as my admin user and go to `/admin/setup/pricing`
+- Select Flat rate + Usage-based and generated the plans
+- Log out, go to `/pricing` and subscribe to the **Starter** plan
+- Created an **API key**
+
+After reaching 21 units _(API calls)_, the Upcoming Invoice total calculation is different. As we're using **GRADUATED** prices, each tier accumulates.
+
+![Upcoming Invoice - Graduated](https://cdn-images-1.medium.com/max/800/1*jb5SSSUnVFInJ4hwqhGnKg.png)
+
+You may wonder how I'm reporting usage, it's really simple:
+
+- **For API calls**: _await reportUsage(apiKey.tenantId, "api");_
+- **For custom entities**: _await reportUsage(tenantId, "ENTITY_NAME");_
+
+The _**reportUsage(tenant, unit)**_ function handles everything:
+
+![reportUsage(tenant, unit)](https://cdn-images-1.medium.com/max/800/1*DKX0X95kXHZh4Xz-Q9QBHw.png)
+
+### One-time prices
+
+Finally, we could use this model to charge for:
+
+- Add-ons
+- Any digital good: _ebooks, courses, videos…_
+- Implementation services
+- Lifetime access
+
+And of course, once bought, it belongs to the customer for ever.
+
+To showcase this, I went and created a new plan called _"All-access"_ at `/admin/setup/pricing/new`.
+
+![One-time plan](https://cdn-images-1.medium.com/max/800/1*-DgIaW2M4IDrBhFKnu0hyQ.png)
+
+Using the same account that I used to test the usage-based pricing _(I used the `/admin/users` impersonate button)_, I'll go to the `/subscription/:tenant` page to buy the **All-access** plan.
+
+![3 recurring + 1 one-time plans](https://cdn-images-1.medium.com/max/800/1*ZLOVJHG17mSEWTvfHN7Nww.png)
+
+Finally, our subscription looks like this:
+
+![All-access + Starter plans](https://cdn-images-1.medium.com/max/800/1*4gNnnaqcICQ75KG3nhAO9A.png)
+
+---
+
+## 3/3 - Two different paths for subscribing
+
+### 1) Sign up, then Subscribe
+
+Almost every SaaS requires you to sign up before going to a /subscription page. For me, _**this is good UX**_.
+
+But there's one problem, SPAM. You can solve using one or multiple strategies:
+
+- reCAPTCHA
+- Email verification
+- CSRF fields
+
+SaasRock already supports the three of them.
+
+![app/utils/db/appConfiguration.db.server.ts](https://cdn-images-1.medium.com/max/800/1*CnfEka92UhSpvixoAeJoQA.png)
+
+![/register](https://cdn-images-1.medium.com/max/800/1*BU9NhuxrunoOTiXz3OOqzA.jpeg)
+
+After our users create their accounts, they can use our app _(with its limits)_, and they can manage their subscription at `/app/:tenant/settings/subscription` and click on View all plans & prices to be redirected to `/subscribe/:tenant` page.
+
+![Tenant Subscription](https://cdn-images-1.medium.com/max/800/1*8br7WpVeHeR77HxOJQjAFw.png)
+
+But what if we could reduce SPAM even more?
+
+### 2) Subscribe, then Sign up
+
+Asking users to subscribe before creating an account will turn off a lot of prospects for sure, but hey, it will also turn off a lot of bots almost. For me, _**this is great UX**_.
+
+This is actually what [TailwindUI](https://tailwindui.com/all-access) does: Provide your email and payment details first and set up your account after.
+
+SaasRock uses Stripe Checkout for subscriptions, so 2 main issues arise from this:
+
+1. What if the anon user paid for, say the Starter $99 plan, but closed the explorer after that? And even worse, he/she was on incognito mode so the redirected URL with the session ID is lost.
+2. What if the user used an email that is already registered on the platform? Shouldn't he/she should've used the `/subscribe/:tenant` route instead? Or is he/she trying to create a separate account?
+
+First things first, our user paid from our `/pricing` page, so it makes sense that the success redirection URL should be `/pricing/session_id/success`.
+
+### Pricing page
+
+![/pricing](https://cdn-images-1.medium.com/max/800/1*ykuqCqkvsK0EysfNSOa7HA.png)
+
+### Stripe Checkout
+
+![Stripe Checkout](https://cdn-images-1.medium.com/max/800/1*plAmWXjLxZhVCc7cBwHJOA.png)
+
+### Checkout Success page
+
+![/pricing/:session_id/success](https://cdn-images-1.medium.com/max/800/1*aZB6hUTUAl2RoWVUUB6ktQ.png)
+
+Upon arrival to the Checkout Success page, we need to store the session with a _**pending=true**_ state in the database, AND send an email to the user with the redirected URL: `/pricing/session_id/success`.
+
+![Set up Account Email](https://cdn-images-1.medium.com/max/800/1*277WFhDQl2NcKMD3L48FeA.png)
+
+This way, we've backed up the session with the subscribed plan(s) by storing it in the database, and by sending it to the user.
+
+And of course, the session cannot be used more than once _(only if our session status is **pending=false**)_:
+
+![Bought plans already added to a tenant/account](https://cdn-images-1.medium.com/max/800/1*StXZyHuKCDrsuc1wmJzAEg.png)
+
+If you want to enable/disable one sign-up flow, just update the following flags:
+
+- **required**: _true_ → redirects user to `/subscribe/:tenant`
+- **allowSubscribeBeforeSignUp**: _false_ → buttons at `/pricing` are hidden
+- **allowSignUpBeforeSubscribe**: _false_ → `/register` redirects to `/pricing`
+
+![getAppConfiguration()](https://cdn-images-1.medium.com/max/1600/1*03WkaT7IsJRCrIx84O_h5w.png)
+
+---
+
+## Bonus - Other challenges
+
+I encountered a few tedious problems, but I solved them so you don't have to.
+
+### Internationalization
+
+If you're planning to have customers in England and Spain, better to have English and Spanish translations.
+
+Take a look a the following translation keys:
+
+![locales/…/translations.json](https://cdn-images-1.medium.com/max/1600/1*mChQWDaNbqGEMA8puXC3nQ.png)
+
+You can use those keys when creating/updating **Plan Features**:
+
+![Features](https://cdn-images-1.medium.com/max/1600/1*hON0nN0sSdyNJcWq1vO5Mw.png)
+
+So your pricing page would be dynamic _(currency and language)_:
+
+![English & Spanish - Pricing page](https://cdn-images-1.medium.com/max/1600/1*_cKdOzl3opvH8x2HjkC5fg.png)
+
+If that's not internationalization, I don't know what is 😜.
+
+### Feature Limits
+
+Take a look at the following plans that I have subscribed to:
+
+![Starter and Enterprise plans](https://cdn-images-1.medium.com/max/1600/1*2DsTYWoRpYA-JbaS0HfLAg.png)
+
+I should have the right to:
+
+- 5 + 12 = **17** users
+- 45 + 90 = **135** contracts/month
+- **Unlimited** API calls!
+- **Priority support**
+
+![Merged features](https://cdn-images-1.medium.com/max/1600/1*_rJlxvKyEhRgjI81hCV4Lg.png)
+
+You could customize this functionality by modifying the **mergeFeatures(features)** function at the `subscriptionService.ts` file:
+
+![mergeFeatures([])](https://cdn-images-1.medium.com/max/1600/1*LGZICVd_2bk1-KfIpVDe3Q.png)
+
+And what about per seat pricing plans? Let's see if it also works. 3 Starter Seats:
+
+![3 Starter Seats](https://cdn-images-1.medium.com/max/1600/1*DoJeYsPaguutqn4xGi6aAw.png)
+
+![My Subscription](https://cdn-images-1.medium.com/max/1600/1*t8zStD5yNOKk9FpJqKEPfA.png)
+
+3 times the feature limit values:
+
+- 5 x 3 = **15** users
+- 45 x 3 = **135** contracts
+- 100 x 3 = **300** API calls
+
+### Multiple Usage-based Units
+
+I created the following plans, with 2 usage-based units:
+
+- **API calls**
+- **Employees** _(custom entity)_
+
+And a flat fee, so every plan has 3 prices.
+
+![Multiple units](https://cdn-images-1.medium.com/max/1600/1*-OGSYbRd2K3xTADCXQWWLQ.png)
+
+If I subscribe to the Starter plan, this is the Checkout page:
+
+![$199 + 2 usage-based prices](https://cdn-images-1.medium.com/max/1600/1*UIZ91c83zMBsNe8H8zDMCA.png)
+
+You could imagine that if I create 10 _employees_ from the _API_, that would be 20 units 😂, but I'll do it just for demonstration purposes - I'm using VOLUME tiers.
+
+11 Employees created + 11 successful API calls = $219.88
+
+![$219.88](https://cdn-images-1.medium.com/max/1600/1*FsNGZSvIBOkYj-e8jY4Fgg.png)
+
+---
+
+## Conclusion - Hard work, but it was worth it 🤘
+
+v0.6 is fun and all, but I'm already hearing SaasRock subscribers asking for:
+
+- [Paddle](https://developer.paddle.com/api-reference/1384a288aca7a-api-reference)/[PayPal](https://developer.paypal.com/api/rest/) alternative integrations
+- [Stripe Connect](https://stripe.com/docs/connect) for marketplaces or affiliate commissions
+- Trial-ending transactional emails
+- And more 😮‍💨…
+
+I can't promise any feature, but I can tell you that the majority of the community wishes for a 100% stripe implementation, so maybe forget about Paddle for a while _(or forever)_:
+
+![SaasRock community feedback](https://cdn-images-1.medium.com/max/800/1*kgrGwsqmxLGkhAY0BnZxTQ.png)
+
+## When v0.7?
+
+Now that the Pricing & Subscriptions got a huge upgrade, I'll start working on another feature that is getting me excited to build: **Affiliate + Referrals**:
+
+- `/affiliates`: Become an affiliate
+- `/affiliate`: My dashboard as an affiliate, my analytics, my payouts, my referrals
+- `/admin/affiliates`: CRUD affiliates, accept requests, view links
+- `/admin/affiliates/referrals`: Visitors/subscriptions per link
+- `/admin/affiliates/commissions`: Commission per sale/affiliate, and Paid status _(payments would be manual for MVP of course, but I guess a PayPal integration mid-term or Stripe Connect)_
+
+Some notes:
+
+- Referrals would be identified by query params _**(ref, referral, or via)**_
+- Or by custom routes _(website.com/my-affiliate-1)_
+- Referrals could have a coupon _(e.g. -20% for 6 months)_
+- SaasRock subscribers could apply for the affiliate program so you'd be my guinea pigs
+
+Subscribe to the [SaasRock newsletter](https://saasrock.com/newsletter) and stay in the loop!
+
+_PS: v0.6 will be released Sunday 11th, 2022 at night GMT-5._
+
+Thanks for reading!
+
+- Alex
