@@ -50,7 +50,7 @@ export default function Newsletter({ url }) {
               {names[i].title}
             </button> */}
             <a
-              href="https://saasrock.com"
+              href="https://saasrock.com/?ref=alexandro.dev&utm_campaing=front"
               target="_blank"
               className="text-gray-800 font-normal hover:text-gray-900 hover:border-blue-500 border-b border-dashed border-blue-300"
             >

@@ -101,7 +101,7 @@ export default function Post({ meta, children, posts }) {
               or subscribe to the{' '}
               <a
                 target="_blank"
-                href="https://saasrock.com/newsletter"
+                href="https://saasrock.com/newsletter?ref=alexandro.dev&utm_campaing=footer"
                 className="font-medium text-purple-500 hover:text-purple-600"
               >
                 Newsletter
