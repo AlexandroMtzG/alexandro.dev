@@ -1,0 +1,82 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Long-running processes in Serverless Environments',
+  category: 'Article',
+  description: `Issues I had with long-running functions on Vercel and Supabase.`,
+  date: '2022-11-15T13:08:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Last week I launched [Gumcrm](https://gumcrm.io/?ref=alexandro.dev&utm_content=long-running-processes), and I wanted to share some issues I had with long-running functions on Vercel and Supabase.
+
+<img
+  src={image}
+  alt="SaasRock v0.7 -Building a Low-code CRUD generator on steroids for SaaS apps"
+/>
+
+<!--more-->
+
+## Requirement - 25,128 DB calls under 1 min
+
+My app syncs Gumroad sales and contacts. Since I'm using my SaaS [boilerplate](https://saasrock.com/?ref=alexandro.dev&utm_content=long-running-processes), every sale row needs a lot of Database queries:
+
+1. Insert sale row
+2. Check if the current subscription can add another contact
+3. Check if the current user has `entity.contacts.create`
+4. Grab the next contact folio _(CTC-0001, CTC-0002...)_
+5. Insert/update contact row
+6. Insert/update dynamic row values _(custom properties)_
+7. Insert log
+8. Call `events.rows.created` webhook event
+9. Insert company if any _(repeats 2-8 steps but for company)_
+10. Insert contact tags based on sale `(churned, active....)`
+11. Insert `entity.contacts.tags` if didn't exist _(for filtering/reporting...)_
+
+18 database calls for each sale. I have 1,396 gumroad "sales" _(some are $0)_, that's **1,396** x **18** = **25,128** DB calls.
+
+## Problem #1 - Database (Supabase) timeout
+
+On local development _(M1 + [postgres.app](https://postgresapp.com/))_, it took 15 seconds to insert those 1k+ sales + contacts + companies.
+
+On "launch day" _(last Friday)_, I was ready to test in production _(Supabase)_, but the first problem I encountered was:
+
+```
+Error: Timed out fetching a new connection from the pool. Please consider reducing the number of requests or increasing the `connection_limit` parameter (https://www.prisma.io/docs/concepts/components/prisma-client/connection-management#connection-pool). Current limit: 10.
+```
+
+I thought doing what the error message said would fix it:
+
+- Set `connection_limit` to 0, 1, 2, 5, 10, 20...
+- Set `pool_timeout` to 0, 1, 2, 5, 10, 20...
+
+But this led to the next problem.
+
+## Problem #2 - Host (Vercel) timeout
+
+It seemed like I "fixed" the problem... connection pool now waited for all incoming DB calls. But now I got a Vercel timeout error:
+
+`504 Error 'FUNCTION_INVOCATION_TIMEOUT'`.
+
+[After a bit of research](https://vercel.com/docs/concepts/limits/overview#serverless-function-execution-timeout), I remembered that Vercel's `Hobby` plans allow for 10-second functions and `Pro` plans give 60-second functions, but my function lasted more than that, and +60s-functions is only for Enterprise customers.
+
+I tried everything:
+
+- Remove `logs`, `webhook` calls, company `inserts`...
+- Use `Prisma.createMany` function _(does not return created IDs)_
+- Go through each line of code to fix "N+1 select" problems
+- Played more with `connection_limit` and `pool_timeout`
+
+![Commits](https://cdn-images-1.medium.com/max/1600/1*5uFbnw4jIN25gwuSaA26TA.png)
+
+I was really worried that my boilerplate was not production-ready, but then I thought of something in the shower at 4 am.
+
+## Solution - Batches of 250 rows
+
+It may seem obvious now, but the solution was simple:
+
+**Send batches of 250 rows** _(yes, I tried batches of 100, 200, 500, 1,000...)_.
+
+This is how it looks now on [development](https://www.loom.com/share/1d79d7bf0d45476ca174cd6015b46826) _(15s)_ and [production](https://www.loom.com/share/c44743fcd1b946e29a0e1efdfb0fcc39) _(55s)_.
