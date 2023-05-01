@@ -24,12 +24,13 @@ export default function Header() {
       <div className="text-base leading-5 flex space-x-4">
         <a
           href="https://github.com/AlexandroMtzG"
+          target="_blank"
           className="font-medium text-gray-700 hover:text-gray-900"
         >
           <div className="flex space-x-2 items-center">
-            <div className="hidden sm:block">Open source</div>
+            {/* <div className="hidden sm:block">Open source</div> */}
             <svg
-              className="h-7 w-7 sm:h-5 sm:w-5"
+              className="h-7 w-7 sm:h-6 sm:w-6"
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
               y="0px"
@@ -44,13 +45,14 @@ export default function Header() {
         </a>
         <a
           href="https://saasrock.com/newsletter"
-          className="font-medium text-teal-500 hover:text-teal-700"
+          target="_blank"
+          className="font-medium text-gray-700 hover:text-gray-900"
         >
           <div className="flex space-x-2 items-center">
-            <div className="hidden sm:block">Newsletter</div>
+            {/* <div className="hidden sm:block">Newsletter</div> */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-7 w-7 sm:h-5 sm:w-5"
+              className="h-7 w-7 sm:h-6 sm:w-6"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -62,10 +64,11 @@ export default function Header() {
 
         <a
           href="https://twitter.com/alexandromtzg"
-          className="font-medium text-blue-500 hover:text-blue-700 truncate"
+          target="_blank"
+          className="font-medium text-gray-700 hover:text-gray-900 truncate"
         >
           <div className="flex space-x-2 items-center">
-            <div className="hidden sm:block">Follow me</div>
+            {/* <div className="hidden sm:block">Follow me</div> */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
@@ -73,7 +76,7 @@ export default function Header() {
               width="30"
               height="30"
               viewBox="0 0 30 30"
-              className="h-7 w-7 sm:h-5 sm:w-5"
+              className="h-7 w-7 sm:h-6 sm:w-6"
               fill="currentColor"
             >
               {' '}

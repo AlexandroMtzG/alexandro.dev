@@ -1,0 +1,1213 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Building a Contracts SaaS with SaasRock — Part 4 — B2B Document Management Module',
+  category: 'Article',
+  description: `After a 3-day break, I’ll create another entity called Documents so users can share documents between accounts, aka B2B document compliance management.`,
+  date: '2023-02-06T16:54:06.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+After a 3-day break, I’ll create another entity called **Documents** so users can share documents between accounts, _aka B2B document compliance management_.
+
+Check out [part 3](https://dev.to/alexandromtzg/building-a-contracts-saas-with-saasrock-part-3-sharing-contract-with-linked-account-94).
+
+This uses the latest [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=saasrock-delega-part-4) updates, basically v0.8.2 plus a few fixes _(February 6th, 2023)_.
+
+<img
+  src={image}
+  alt="Building a Contracts SaaS with SaasRock — Part 4 — B2B Document Management Module"
+  className="w-full"
+/>
+
+<!--more-->
+
+## Chapter 4
+
+1. Document Concepts
+2. Custom Account Documents **_Calendar View_**
+3. Creating the Document and Document Type Entities
+4. Scanning a Document with [Tesseract.js](https://github.com/naptha/tesseract.js#tesseractjs)
+5. Using the Custom Calendar View
+6. Viewing my Linked Accounts Documents
+
+![B2B Document Management Module](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*mxMuhiCeYPpU9g__AZD_vw.png)
+
+## 1. Document Concepts
+
+There are 3 main document concepts:
+
+- **Document Types** — Type of PDF
+- **Periodicity** — Every N months it’s required
+- **Status** — Whether the document is “valid”, “pending”, “missing” or “n/a”
+
+### What are Document Types?
+
+Here are some examples:
+
+![Document Types Example](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*R7KUE6QnoCk_l4LAdMKIXg.png)
+
+The idea is to have default document types, but let admins create types if needed.
+
+The **Periodicity** determines if the uploaded document needs a period:
+
+- Once
+- **Annually** — 1 a year
+- **Semiannually** — 2 a year
+- **Triannually** — 3 a year
+- **Quarterly** — 4 a year
+- **Bimonthly** — 6 a year
+- **Monthly** — 12 a year
+
+### DTOs
+
+Enums and Types/Interfaces often describe the requirements in a faster way:
+
+For **DocumentTypeDto**, I have two options:
+
+```ts
+// Option 1 - Period name
+type Periodicity =
+  | 'once'
+  | 'annually'
+  | 'semiannually'
+  | 'triannually'
+  | 'quarterly'
+  | 'bimonthly'
+  | 'monthly'
+interface DocumentTypeDto {
+  id?: string
+  name: string
+  description: string
+  periodicity: Periodicity
+}
+
+// Option 2 - Times in year
+interface DocumentTypeDto {
+  id?: string
+  name: string
+  description: string
+  timesInYear: number | null // null if "once"
+}
+```
+
+**Option 1 _(Period Name)_** it’s more readable, while **Option 2 _(Times in Year)_** is more functional. I’d rather go with a functional approach.
+
+And **DocumentDto** will use the **DocumentTypeDto** interface. Both Dtos need to be on their own file so they can be used throughout the app.
+
+```ts
+import { MediaDto } from '~/application/dtos/entities/MediaDto'
+import { DocumentTypeDto } from './DocumentTypeDto'
+
+export interface DocumentDto {
+  id?: string
+  tenant: { id: string; name: string }
+  type: DocumentTypeDto
+  year: number | null
+  period: number | null
+  document: MediaDto
+}
+```
+
+### Starting with the End
+
+I like to start with the final design, then walk the features backward:
+
+1. Documents **CRUD** — Users can submit documents
+2. Document Types **CRUD** — Admins can create new types
+3. My Linked Accounts Documents **Calendar View** — Browse documents from accounts I’ve linked with
+4. Account Documents **Calendar View** — Users can see all their documents
+
+So I need 2 CRUDs and 2 Calendar Views. The logical way of implementing this is to create the CRUDs and once some data is created, read it with the calendar views. But I like to go straight to the end result with fake data.
+
+## 2. Custom Account Documents Calendar View
+
+Starting with a **“AccountDocuments.tsx”** component, I’m going to create a mockup first… no, not with Figma, but Google Sheets 😅:
+
+![Account Documents](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*k5apnpLl--HjvWBy-QQ5sQ.png)
+
+A few things to notice on the required UI component:
+
+- **Grid** — Rows for document types, Columns for months
+- **Cell spans** — Corresponding number of months a year
+- **Check mark** — Submitted document
+- **X mark** — Missing document
+- **Clock icon** — Missing document, but period has not ended
+- **Gray cell** — We’ve not reached that period
+
+### Periods Column Span
+
+The first thing to notice in this table is the column span of each document type, for example, for **_“Articles of Incorporation”_** (once) and **_“Tax Statement”_** (annually) the column span is 12, for **_“Financial Report”_** (quarterly) is 3, and **_“Tax Compliance”_** (monthly) is 1.
+
+![Past, Current, Future](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*JD8MupI-kpLFmdvkS7sH9g.png)
+
+How do I know the column span for each document? I need a helper function that returns me an array of:
+
+- **Number** — The number 1 for a **_“monthly”_** periodicity is **_“January”_**, and for a **_“quarterly”_** periodicity it’s **_“Jan-Mar”_**
+- **Name** — Friendly identifier
+- **From** — When the period starts
+- **To** — When the period ends
+
+```ts
+function getDocumentTypePeriods(
+  timesInYear: number | null
+): { from: Date; to: Date; name: string; number: number }[] {
+  let periods: { from: Date; to: Date; name: string; number: number }[] = []
+  if (timesInYear === 1 || !timesInYear) {
+    periods = [
+      { number: 1, name: 'Jan-Dec', from: new Date(year, 0, 1), to: new Date(year, 11, 31) },
+    ]
+  } else if (timesInYear === 2) {
+    periods = [
+      { number: 1, name: 'Jan-Jun', from: new Date(year, 0, 1), to: new Date(year, 5, 30) },
+      { number: 2, name: 'Jul-Dec', from: new Date(year, 6, 1), to: new Date(year, 11, 31) },
+    ]
+  } else if (timesInYear === 4) {
+    // jan-mar, apr-jun, jul-sep, oct-dec
+    periods = [
+      { number: 1, name: 'Jan-Mar', from: new Date(year, 0, 1), to: new Date(year, 2, 31) },
+      { number: 2, name: 'Apr-Jun', from: new Date(year, 3, 1), to: new Date(year, 5, 30) },
+      { number: 3, name: 'Jul-Sep', from: new Date(year, 6, 1), to: new Date(year, 8, 30) },
+      { number: 4, name: 'Oct-Dec', from: new Date(year, 9, 1), to: new Date(year, 11, 31) },
+    ]
+  } else if (timesInYear === 6) {
+    // jan-feb, mar-apr, may-jun, jul-aug, sep-oct, nov-dec
+    periods = [
+      { number: 1, name: 'Jan-Feb', from: new Date(year, 0, 1), to: new Date(year, 1, 28) },
+      { number: 2, name: 'Mar-Apr', from: new Date(year, 2, 1), to: new Date(year, 3, 30) },
+      { number: 3, name: 'May-Jun', from: new Date(year, 4, 1), to: new Date(year, 5, 30) },
+      { number: 4, name: 'Jul-Aug', from: new Date(year, 6, 1), to: new Date(year, 7, 31) },
+      { number: 5, name: 'Sep-Oct', from: new Date(year, 8, 1), to: new Date(year, 9, 30) },
+      { number: 6, name: 'Nov-Dec', from: new Date(year, 10, 1), to: new Date(year, 11, 31) },
+    ]
+  } else if (timesInYear === 12) {
+    periods = Array.from(Array(12).keys()).map((idx) => ({
+      number: idx + 1,
+      name: getMonthName(idx + 1),
+      from: new Date(year, idx, 1),
+      to: new Date(year, idx + 1, 0),
+    }))
+  }
+  return periods
+}
+```
+
+Depending on the `timesInYear` parameter, it would return a different set of periods:
+
+- _getDocumentTypePeriods_**(1 | null)** = [“Jan-Dec”]
+- _getDocumentTypePeriods_**(2)** = [“Jan-Jun”, “Jul-Dec”]
+- _getDocumentTypePeriods_**(4)** = [“Jan-Mar”, “Apr-Jun”, “Jul-Sep”, “Oct-Dec”]
+- And so on…
+
+### Identifying the Timeline
+
+Before displaying any check or X marks, I need to know whether the current cell is on the `past`, `current (present)`, or `future`:
+
+```ts
+function getDocumentTypeTimeline(
+  type: DocumentTypeDto,
+  period: number
+): 'past' | 'current' | 'future' {
+  const today = new Date()
+  const periods = getDocumentTypePeriods(type.timesInYear)
+  const currentPeriod = periods.find((period) => period.from <= today && period.to >= today)
+  if (year < today.getFullYear()) {
+    return 'past'
+  }
+  if (year > today.getFullYear()) {
+    return 'future'
+  }
+  if (currentPeriod && currentPeriod.number === period) {
+    return 'current'
+  } else if (currentPeriod && currentPeriod.number > period) {
+    return 'past'
+  }
+  return 'future'
+}
+```
+
+### Identifying the Current Document Status
+
+Now that I have each the cell’s column span and current timeline, I need another helper function to check the current document status:
+
+```ts
+function getDocumentsInPeriod(type: DocumentTypeDto, period: number): DocumentDto[] {
+  const yearDocuments = documents.filter((document) => document.year === year || !document.year)
+  const typeDocuments = yearDocuments.filter((document) => document.type.name === type.name)
+  const periodDocuments = typeDocuments.filter(
+    (document) => document.period === period || !document.period
+  )
+  return periodDocuments
+}
+
+function getDocumentInPeriodStatus(
+  type: DocumentTypeDto,
+  period: number
+): 'valid' | 'pending' | 'missing' | 'n/a' {
+  const documentsInPeriod = getDocumentsInPeriod(type, period)
+  const timeline = getDocumentTypeTimeline(type, period)
+  if (documentsInPeriod.length > 0) {
+    return 'valid'
+  }
+  if (!type.timesInYear || timeline === 'past') {
+    return 'missing'
+  }
+  if (timeline === 'future') {
+    return 'n/a'
+  }
+  if (timeline === 'current') {
+    return 'pending'
+  }
+  return 'missing'
+}
+```
+
+The full code for this **_AccountDocuments.tsx_** component is here in this public gist: [gist.github.com/AlexandroMtzG/2dba00f3446f8d89d819aa74fa8d5dca](https://gist.github.com/AlexandroMtzG/2dba00f3446f8d89d819aa74fa8d5dca) or here’s the design only: [play.tailwindcss.com/skAlNv7Q03](play.tailwindcss.com/skAlNv7Q03).
+
+All these helper functions should be in their own **_“DocumentTypeHelper.ts”_** file. I’ve placed it at _“~/modules/documents/helpers/DocumentTypeHelper.ts”_, while the component at _“~/modules/documents/components”_, and the DTOs at _“~/modules/documents/dtos”_.
+
+### Testing the AccountDocuments Component
+
+I’ve created the following route file at _“app/routes/admin/playground/account-documents.tsx”_:
+
+![Account Documents Testing Route](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*3ZUd55RergDKxV6DeSc6Vw.png)
+
+Notice how I replaced the _clock_ icon with an _upload_ one, that’s because this will help me upload a specific document on a specific period. And since today is February 3rd, 2023 and I did not set a **_“Tax Compliance”_** document, it should be on the **_“missing”_** status, so a red X icon should be placed.
+
+```tsx
+import { useState } from 'react'
+import { MediaDto } from '~/application/dtos/entities/MediaDto'
+import MyDocuments from '~/modules/documents/components/AccountDocuments'
+import { DocumentDto } from '~/modules/documents/dtos/DocumentDto'
+import { DocumentTypeDto } from '~/modules/documents/dtos/DocumentTypeDto'
+import InputSearch from '~/components/ui/input/InputSearch'
+import InputSelect from '~/components/ui/input/InputSelect'
+import FakePdfBase64 from '~/components/ui/pdf/FakePdfBase64'
+
+const types: DocumentTypeDto[] = [
+  {
+    name: 'Articles of Incorporation',
+    timesInYear: null, // once
+    description: 'Establishes a corporation as a valid registered business entity',
+  },
+  {
+    name: 'Tax Statement',
+    timesInYear: 1, // annually
+    description: "Calculates the entity's income and the amount of taxes to be paid",
+  },
+  {
+    name: 'Financial Report',
+    timesInYear: 4, // quarterly
+    description: 'Income statement, balance sheet, and cash flow statement',
+  },
+  {
+    name: 'Tax Compliance',
+    timesInYear: 12,
+    description: 'States whether the taxpayer is complying with its tax obligations',
+  },
+]
+
+const fakeFile: MediaDto = {
+  type: 'application/pdf',
+  name: 'Test.pdf',
+  title: 'Test',
+  document: FakePdfBase64,
+}
+
+const fakeTenant = { id: '1', name: 'Tenant 1' }
+const documents: DocumentDto[] = [
+  { type: types[0], tenant: fakeTenant, year: null, period: null, document: fakeFile },
+  { type: types[1], tenant: fakeTenant, year: 2023, period: null, document: fakeFile },
+  { type: types[2], tenant: fakeTenant, year: 2023, period: 2, document: fakeFile },
+  // { type: types[3], tenant: fakeTenant, year: 2023, period: 1, document: fakeFile },
+]
+
+export default function () {
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [searchInput, setSearchInput] = useState<string>('')
+
+  function filteredTypes() {
+    return types.filter(
+      (t) =>
+        t.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+        t.description.toLowerCase().includes(searchInput.toLowerCase())
+    )
+  }
+  return (
+    <div className="space-y-2 p-4">
+      <div className="space-y-1">
+        <h1 className="font-bold text-gray-800">Account Documents View</h1>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex space-x-2">
+          <div className="w-full">
+            <InputSearch value={searchInput} setValue={setSearchInput} />
+          </div>
+          <div className="w-32">
+            <InputSelect
+              value={year}
+              options={[
+                { name: '2023', value: 2023 },
+                { name: '2022', value: 2022 },
+              ]}
+              setValue={(e) => setYear(Number(e))}
+            />
+          </div>
+        </div>
+        <MyDocuments year={year} types={filteredTypes()} documents={documents} />
+      </div>
+    </div>
+  )
+}
+```
+
+Up to this point, I have 5 new files, and 1 file edit _(admin/playground.tsx)_:
+
+![git changes](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lvqgBntjEd-Ykcr2PCgMKQ.png)
+
+Here’s the demo: [saasrock-delega-kyfzljxz4-factura.vercel.app/admin/playground/account-documents](https://saasrock-delega-kyfzljxz4-factura.vercel.app/admin/playground/account-documents).
+
+And if you’re a SaasRock Enterprise subscriber, you can get the code up to this point here: [github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-account-documents-DTOs-component-and-helper](https://github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-account-documents-DTOs-component-and-helper).
+
+## 3. Creating the Document and Document Type Entities
+
+I need a _Parent → Children_ relationship between **Document Type** _(parent)_ and **Document** _(child)_, but the Entity Builder does not autogenerate code for relationships, but I’ll implement it sometime this year, I hope.
+
+For these 2 new entities, I’m going to use custom database models _(in contrast, the Contracts entity, built in Chapters 2 and 3, is fully dynamic)_, but I’ll still use the code generator to get a starting point for both entities.
+
+### Preparing the Database Schema
+
+First things first. My new prisma schema with the relationships:
+
+```diff
+model Row {
+  id                 String                  @id @default(cuid())
+  ...
+  signers            Signer[]
++ document           Document?
++ documentType       DocumentType?
+}
+...
++ model Document {
++  rowId    String       @unique
++  row      Row          @relation(fields: [rowId], references: [id], onDelete: Cascade)
++  typeId   String
++  type     DocumentType @relation(fields: [typeId], references: [rowId])
++  year     Int?
++  period   Int?
++  document String?
++}
+
++ model DocumentType {
++  rowId       String     @unique
++  row         Row        @relation(fields: [rowId], references: [id], onDelete: Cascade)
++  name        String
++  description String
++  timesInYear Int?
++  documents   Document[]
++}
+```
+
+Notice how the Ids are basically Rows! This means that even though these entities will be custom, they’ll still benefit from being a Row: permissions, tags, and so on.
+
+### Modeling the Entities
+
+I need autogenerated code to start customizing, so it makes sense to model the 2 new entities with the corresponding database types.
+
+**Document Type** properties — **name** _(text)_, **description** _(text)_, and **timesInYear** _(optional number)_. And this entity is of type “Admin”, as it should not appear on the tenant side _(at /app/:tenant/document-types)_:
+
+![Document Type Properties](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lAQ9mMWFJtdnLa6miSEmbA.png)
+
+**Document** properties — **typeId** _(text)_, **year** _(optional number)_, **period** _(optional number)_, and **document** _(media)_:
+
+![Document Properties](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*pXZB_pJ_Hhh-W91MXIKAuA.png)
+
+As I said, having a **_“Type (typeId)”_** property will not automatically generate code for the _Document Type → Documents_ relationship, but at least it will give me something to override. Another thing to note is that “media/MediaDto” properties are a compound of 4 things: title, _name_, _file_, _type_, and _file/publicUrl_, and on the model, I’m just using a String property, that would require some override as well to create manually the supabase file.
+
+Now I’ll commit the 47 file changes _(23 files for each entity and 1 for the schema.prisma file)_ to start customizing:
+
+![git changes](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*WatX_Ea3dO1DENwoPJOY7w.png)
+
+### Moving the Routes to their corresponding folder
+
+By default, the code generator places the 6 routes _(Index, New, Edit, Tags, Share, and Activity)_ within the folder _“app/routes/admin/entities/code-generator/tests/document-types”_.
+
+I’ll cut and paste the **_“document-types”_** folder within _“app/routes/admin”_. But it should be visible for Admins, so I’ll add it to the sidebar using the **_“AdminSidebar.tsx”_** file.
+
+```diff
+...
+export const AdminSidebar = (t: TFunction): SideBarItem[] => [
+  ...
+  {
+    title: t("segments.manage"),
+    icon: SvgIcon.DASHBOARD,
+    path: "",
+    items: [
+      ...
+      {
++       title: "Documents",
++       path: "/admin/documents",
++       icon: <DocumentsBoxIcon className="h-5 w-5 text-white" />,
++       items: [
++        {
++          title: "Document Types",
++          path: "/admin/document-types",
++        },
++       ],
+      },
+      ...
+```
+
+Now my autogenerated routes should be visible at _/admin/document-types_:
+
+![Document Types Index Route](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*FGlAnwCfgSO7DwYSP1VERQ.png)
+
+… and the **_“documents”_** folder, should be placed in _“app/routes/app.$tenant”_:
+
+![Documents Index Route](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*JvpNPfOEt55_DDx8TQ8PgA.png)
+
+Now it’s visible at _“/app/:tenant/documents”_.
+
+This should give me about 12 file index renames _(6 files for each entity)_ and 1 **_AdminSidebar_** file change:
+
+![git changes](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*dZVwgZpTzdDoMRNNJy5luw.png)
+
+### Overriding the “Document Types” Autogenerated Code
+
+If I create a Document Type row, it will save it, but not as I want it to. I want it to create a **_DocumentType_** record, and right now it’s using dynamic values. I can verify this by querying the model in my database _(I’m using [DBeaver](https://dbeaver.io/) with a local postgres database in [Postgres.app](https://postgres.app/))_:
+
+![SELECT * FROM “DocumentType”;](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*NEtXaJyx3BALsmsLy8vUwA.png)
+
+The first thing I need to do, is to override the **_“DocumentTypesService.create()”_** method to manually set the values:
+
+```diff
+...
++ import { Prisma } from "@prisma/client";
+export namespace DocumentTypeService {
+  ...
+  export async function create(data: DocumentTypeCreateDto, session: { tenantId: string | null; userId?: string }): Promise<DocumentTypeDto> {
+    const entity = await getEntity();
+-   const rowValues = RowHelper.getRowPropertiesFromForm({
+-     entity,
+-      values: [
+-        { name: "name", value: data.name },
+-        { name: "description", value: data.description },
+-        { name: "timesInYear", value: data.timesInYear?.toString() },
+-      ],
+-   });
+    const item = await RowsApi.create({
+      tenantId: session.tenantId,
+      userId: session.userId,
+      entity,
+-     rowValues,
++     rowCreateInput: {
++      documentType: {
++        create: {
++          name: data.name,
++          description: data.description,
++          timesInYear: data.timesInYear,
++          },
++        },
++      },
+    });
+    return DocumentTypeHelpers.rowToDto({ entity, row: item });
+  }
+  ...
+}
+```
+
+After this change, when I create a new **_“DocumentType”_**, the database model will be registered correctly, without losing its relationship as a **_“Row”_**:
+
+![SELECT * FROM “DocumentType”;](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*XtcUAg211hMwBcif0e3XrQ.png)
+
+The same type of override for updating:
+
+```diff
+export namespace DocumentTypeService {
+  ...
+  export async function update(id: string, data: Partial<DocumentTypeDto>, session: { tenantId: string | null; userId?: string }): Promise<DocumentTypeDto> {
+    const entity = await getEntity();
+    const row = await getRowById(id);
+    if (!row) {
+      throw Error("Not found");
+    }
+-    const values: RowValueUpdateDto[] = [];
+-    if (data.name !== undefined) {
+-      values.push({ name: "name", textValue: data.name });
+-    }
+-    if (data.description !== undefined) {
+-      values.push({ name: "description", textValue: data.description });
+-    }
+-    if (data.timesInYear !== undefined) {
+-      values.push({ name: "timesInYear", numberValue: data.timesInYear });
+-    }
++    const rowUpdateInput: Partial<Prisma.RowUpdateInput> = {
++     documentType: {
++       update: {
++         name: data.name,
++         description: data.description,
++         timesInYear: data.timesInYear,
++       },
++     },
++   };
+    const item = await RowValueHelper.update({
+      entity,
+      row,
+-     values,
++     rowUpdateInput,
+      session,
+    });
+    return DocumentTypeHelpers.rowToDto({ entity, row: item });
+  }
+  ...
+}
+```
+
+But I’m not using dynamic properties anymore, but hardcoded models _(**DocumentType**, and **Document**)_. So I need to tell the database to include those tables at _**“app/utils/db/entities/rows.db.server.ts”**_:
+
+```diff
+// rows.db.server.ts
+import {
+  ...
++ DocumentType,
++ Document,
+} from "@prisma/client";
+...
+export type RowWithDetails = Row & {
+  createdByUser: UserSimple | null;
+  ...
+  signers: (Signer & { tenant: Tenant; user: UserSimple })[];
++ documentType: DocumentType | null;
++ document: (Document & { type: DocumentType }) | null;
+};
+
+export const includeRowDetails = {
+  ...includeSimpleCreatedByUser,
+  createdByApiKey: true,
+  ...
+  signers: { include: { tenant: true, user: { select: UserUtils.selectSimpleUserProperties } } },
++ documentType: true,
++ document: { include: { type: true } },
+};
+```
+
+And map these values in the **_“DocumentTypeHelpers.rowToDto()”_** function:
+
+```diff
+// DocumentTypeHelpers.ts
+...
++ import RowValueHelper from "~/utils/helpers/RowValueHelper";
+
+function rowToDto({ entity, row }: { entity: EntityWithDetails; row: RowWithDetails }): DocumentTypeDto {
+  return {
+    row,
+    prefix: entity.prefix,
+-   name: RowValueHelper.getText({ entity, row, name: "name" }) ?? "", // required
+-   description: RowValueHelper.getText({ entity, row, name: "description" }) ?? "", // required
+-   timesInYear: RowValueHelper.getNumber({ entity, row, name: "timesInYear" }), // optional
++   name: row.documentType!.name,
++   description: row.documentType!.description,
++   timesInYear: row.documentType!.timesInYear ?? undefined,
+  };
+}
+```
+
+And that’s all! But I’m going to improve it a little bit more. Filters are not working anymore, since I’m using custom database properties, I need to manually filter:
+
+```diff
+...
++ import RowFiltersHelper from "~/utils/helpers/RowFiltersHelper";
+
+export namespace DocumentTypeService {
+  ...
+  export async function getAll({ tenantId, userId, urlSearchParams }: {
+    tenantId: string | null;
+    userId?: string;
+-     urlSearchParams: URLSearchParams;
++     urlSearchParams?: URLSearchParams;
+  }): Promise<{ items: DocumentTypeDto[]; pagination: PaginationDto }> {
+    const entity = await getEntity();
++     let rowWhere: Prisma.RowWhereInput = {};
++    const propertiesToFilter = ["q", "id", "folio", "name", "description", "timesInYear"];
++    if (propertiesToFilter.some((p) => urlSearchParams?.has(p))) {
++      rowWhere = {
++        documentType: {
++          OR: [
++            { name: { contains: RowFiltersHelper.getParam_String(urlSearchParams, ["q", "name"]) } },
++            { description: { contains: RowFiltersHelper.getParam_String(urlSearchParams, ["q", "description"]) } },
++            { timesInYear: { equals: RowFiltersHelper.getParam_Number(urlSearchParams, ["q", "timesInYear"]) } },
++          ],
++        },
++      };
++    }
+    const data = await RowsApi.getAll({
+      entity,
+      tenantId,
+      userId,
+-     urlSearchParams,
++     rowWhere,
+    });
+    return {
+      items: data.items.map((row) => DocumentTypeHelpers.rowToDto({ entity, row })),
+      pagination: data.pagination,
+    };
+  }
+  ...
+}
+```
+
+The object `rowWhere` is basically exposing the [Prisma](http://prisma.io/docs) types for filtering. You can inspect the _“RowFiltersHelper.getParam_()”_ … helper functions, but they basically get the filters from the URL, both from the global search parameter called _“q”_, and the parameter name itself _(like “name”, or “description”)\_.
+
+Finally, I can customize which filters I want to be shown at the route API:
+
+```diff
+...
+export namespace DocumentTypeRoutesIndexApi {
+  ...
+  export let loader: LoaderFunction = async ({ request, params }) => {
+    const data: LoaderData = {
+      metadata: { title: "Document Type | " + process.env.APP_NAME },
+      items,
+      pagination,
+-       filterableProperties: EntityHelper.getFilters({ t, entity: await getEntityByName("documentType") }),
++       filterableProperties: [
++        { name: "name", title: "Name" },
++        { name: "description", title: "Description" },
++        { name: "timesInYear", title: "Times in Year" },
++      ],
+    };
+    ...
+```
+
+End result:
+
+![Document Types End Result](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*-uMdFvwamplW6pgOCinWBQ.png)
+
+I’ll commit the override of the **DocumentTypes** CRUD _(5 files)_:
+
+![git changes](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*BlN0CFX7zrOINuiSXWoImw.png)
+
+### Overriding the “Document” Autogenerated Code
+
+I’ll do the same steps I did for the “Document Types” override, so I’ll skip the **_“DocumentService.ts”_** file modifications _(create, update, and getAll functions)_.
+
+Whenever there are files involved, there needs to be some custom mapping to use the **MediaDto** interface, remember I mentioned that before _(title, name, file, type, and file/publicUrl)_?
+
+```diff
+...
++ import RowValueHelper from "~/utils/helpers/RowValueHelper";
++ import { MediaDto } from "~/application/dtos/entities/MediaDto";
+
+function rowToDto({ entity, row }: { entity: EntityWithDetails; row: RowWithDetails }): DocumentDto {
+  return {
+    row,
+    prefix: entity.prefix,
+-   typeId: RowValueHelper.getText({ entity, row, name: "typeId" }) ?? "", // required
+-   year: RowValueHelper.getNumber({ entity, row, name: "year" }), // optional
+-   period: RowValueHelper.getNumber({ entity, row, name: "period" }), // optional
+-   document: RowValueHelper.getFirstMedia({ entity, row, name: "document" }) as MediaDto, // required
++   typeId: row.document?.typeId ?? "",
++   year: row.document?.year ?? undefined,
++   period: row.document?.period ?? undefined,
++   document: {
++     type: "application/pdf",
++     file: row.document?.document ?? "",
++     name: (row.documentType?.name ?? row.id) + ".pdf",
++     title: row.documentType?.name ?? row.id,
++   },
+  };
+}
+...
+```
+
+And one important thing to note here is that I don’t even need to map the **_“type”_** object because it’s in the row itself. See how I’m using it to render it on the index route view:
+
+```diff
+...
+export default function DocumentRoutesIndexView() {
+  ...
+  return (
+    <IndexPageLayout
+      title={t("Documents")}
+      ...
+    >
+      <TableSimple
+        items={data.items}
+        ...
+        headers={[
+          ...
+          {
+            name: "typeId",
+            title: t("Type"),
+-           value: (item) => <div className="max-w-sm truncate">{item.typeId}</div>,
++           value: (item) => <div className="max-w-sm truncate">{item.row.document?.type?.name}</div>,
+          },
+          ...
+
+```
+
+Right now, the Document Form renders the **Type (typeId)** property as text.
+
+![New Document Form](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*_PYQ8RoFmzme-is8t5hp5Q.png)
+
+But this should be a selector showing all the **_Document Types_** registered. And I should get ALL document types, bypassing row permissions.
+
+I could do this using the **_“DocumentRoutes.New.Api.ts”_** _LoaderData_, but Document Types are going to be used throughout the application _(for example onboarding or something else)_, so it would make sense to always have them on the _/app_ data.
+
+```diff
+// app/utils/data/useAppData.ts
+...
++ import { DocumentTypeService } from "~/modules/codeGeneratorTests/document-types/services/DocumentTypeService";
++ import { DocumentTypeDto } from "~/modules/codeGeneratorTests/document-types/dtos/DocumentTypeDto";
+
+export type AppLoaderData = AppOrAdminData & {
+  currentTenant: TenantWithDetails;
+  ...
++ documentTypes: DocumentTypeDto[];
+};
+...
+
+export async function loadAppData(request: Request, params: Params) {
+  ...
+  const data: AppLoaderData = {
+    ...
++   documentTypes: (await DocumentTypeService.getAll({ tenantId: null, userId: undefined })).items,
+  };
+  return data;
+}
+```
+
+And use this using the helper function **_“useAppData()”_** in the **_“DocumentForm.tsx”_**:
+
+```diff
+...
+export default function DocumentForm({ ... }) {
++   const appData = useAppData();
+  const transition = useTransition();
+  return (
+    <Form key={!isDisabled() ? "enabled" : "disabled"} method="post" className="space-y-4">
+      {item ? <input name="action" value="edit" hidden readOnly /> : <input name="action" value="create" hidden readOnly />}
+
+      <InputGroup title={t("shared.details")}>
+        <div className="space-y-2">
+-         <InputText name="typeId" title={t("Type")} required autoFocus disabled={isDisabled()} value={item?.typeId} />
++         <InputSelector
++          name="typeId"
++          title={t("Type")}
++          required
++          autoFocus
++          disabled={isDisabled()}
++          value={item?.typeId ?? (isCreating && appData.documentTypes.length > 0) ? appData.documentTypes[0].row.id : undefined}
++          options={appData.documentTypes.map((x) => ({ value: x.row.id, name: x.name }))}
++          withSearch={false}
+          />
+          ...
+```
+
+This would now render the property control correctly, listing all the document types available:
+
+![New Document Form](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*3veMX3QZ57S8weKyMz5zTA.png)
+
+And finally, I want the filters to be **_“year”_** and **_“typeId”_** only. And type should be a list of the document types:
+
+```diff
+...
+export namespace DocumentRoutesIndexApi {
+  ...
+  export let loader: LoaderFunction = async ({ request, params }) => {
++   const allDocumentTypes = (await DocumentTypeService.getAll({ tenantId: null, userId: undefined })).items;
+    const data: LoaderData = {
+      metadata: { title: "Document Type | " + process.env.APP_NAME },
+      items,
+      pagination,
+-     filterableProperties: EntityHelper.getFilters({ t, entity: await getEntityByName("documentType") }),
++     filterableProperties: [
++      { name: "year", title: "Year" },
++      {
++        name: "typeId",
++        title: "Type",
++        options: allDocumentTypes.map((f) => {
++          return { value: f.row.id, name: f.name };
++          }),
++        },
++      ],
+    };
+    ...
+```
+
+End result:
+
+![Documents End Result](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*-XLNc3WQmXQqQJOv21cMKQ.png)
+
+### Storing the Supabase File
+
+Since I went out of the dynamic properties, now it doesn’t automatically store my file in a cloud storage provider ([Supabase](https://supabase.io/)) anymore. So I need to do it manually:
+
+```diff
+...
+export namespace DocumentService {
+  ...
+  export async function create(data: DocumentCreateDto, session: { tenantId: string | null; userId?: string }): Promise<DocumentDto> {
+    const entity = await getEntity();
++     const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
++     const documentPublicUrl = await storeSupabaseFile({
++      bucket: "documents",
++      content: data.document.file,
++      id: randomId + ".pdf",
++    });
+    const item = await RowsApi.create({
+      ...
+      rowCreateInput: {
+        document: {
+          create: {
+              ...
+-             document: data.document.file,
++             document: documentPublicUrl,
+          },
+        },
+      },
+    });
+    ...
+```
+
+See how I’m storing it with a `randomId` in a bucket called **_“documents”_**. After creating another document, if I go to my supabase dashboard, I will have the bucket with my file:
+
+![Supabase Buckets Dashboard](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*0BVgO8vfkIH0ghvvABuXhQ.png)
+
+But I need to handle file updates, and deletions as well:
+
+```diff
+...
+export namespace DocumentService {
+  ...
+  export async function update(id: string, data: Partial<DocumentDto>, session: { tenantId: string | null; userId?: string }): Promise<DocumentDto> {
+    const entity = await getEntity();
+    const row = await getRowById(id);
+    if (!row) {
+      throw Error("Not found");
+    }
++   let newDocumentPublicUrl: string | undefined;
++   if (data.document?.file) {
++     const fileName = row?.document?.document?.split("/").pop();
++     if (fileName) {
++        await deleteSupabaseFile("documents", fileName);
++        const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
++        newDocumentPublicUrl = await storeSupabaseFile({
++          bucket: "documents",
++          content: data.document.file,
++          id: randomId + ".pdf",
++        });
++      }
++    }
+    const rowUpdateInput: Partial<Prisma.RowUpdateInput> = {
+      document: {
+        update: {
+          ...
+-         document: data.document?.file,
++         document: newDocumentPublicUrl,
+        },
+      },
+    };
+    ...
+  }
+  export async function del(id: string, session: { tenantId: string | null; userId?: string }): Promise<void> {
+    const entity = await getEntity();
+    const item = await get(id, session);
++     const fileName = item?.document.file.split("/").pop();
++    if (fileName) {
++      await deleteSupabaseFile("documents", fileName);
++    }
+    await RowsApi.del(id, {
+      entity,
+      tenantId: session.tenantId,
+      userId: session.userId,
+    });
+  }
+```
+
+So it’s a little manual work but at the same time full control over my buckets and files. I could improve file naming, or support other extensions, not only .pdf, by adding a `name` and `type` properties to the Document model, but this is just MVP. Here’s the deployed [demo](https://saasrock-delega-4qfj0emnl-factura.vercel.app/admin/document-types).
+
+![Deployed Demo](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*ay8r6vK6Ka4M04tuR0kXsA.png)
+
+For SaasRock Enterprise subscribers, the release up to this point is here: [github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-customized-CRUDs](https://github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-customized-CRUDs), and here’s the entity configuration I’m using so far.
+
+Or just watch the video demo of the progress so far: https://www.loom.com/share/590c83521b6642269587575b6d9b2cc8?t=20
+
+## 4. Scanning a Document with Tesseract.js
+
+First, I’m going to install tesseract.js:
+
+```
+npm i tesseract.js@4.0.2
+```
+
+Tesseract can’t actually scan PDFs, so first I need to convert my images.
+
+I built a tool a simple API to convert PDF to Images at [https://tools.saasrock.com/api/pdf-to-image?file=XXX](https://tools.saasrock.com/api/pdf-to-image?file=XXX) but you can use any method you want:
+
+![/api/pdf-to-image](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*nZqz5hx3PTFayt992cHmJg.png)
+
+I’m going to wrap this API call into a **_“PdfService”_**:
+
+```ts
+// PdfService.ts
+
+async function convertToImages({
+  file,
+}: {
+  file: string
+}): Promise<{ name: string; base64: string; path: string }[]> {
+  return new Promise(async (resolve, reject) => {
+    await fetch('https://tools.saasrock.com/api/pdf-to-image?file=' + file)
+      .then(async (response) => {
+        const jsonBody = await response.json()
+        const images = jsonBody.images as { name: string; base64: string; path: string }[]
+        resolve(images)
+      })
+      .catch((e) => {
+        reject(e)
+      })
+  })
+}
+export default {
+  convertToImages,
+}
+```
+
+If you’re curious about the code, [here’s a public gist](https://gist.github.com/AlexandroMtzG/ac3800b60e768cfc4f6115680715ccf3) _(ignore the commented code, I tried too many ways and this was the only way it worked in vercel)_, I used this repo for reference.
+
+And build a simple **_“OcrTesseractService”_** to consume it. [Here’s the gist](https://gist.github.com/AlexandroMtzG/65e6ff82ed3b961c71391138f9648350).
+
+```ts
+// OcrTesseractService.ts
+
+import Tesseract from 'tesseract.js'
+import PdfService from './PdfService'
+
+export const OcrTesseractLanguages = [
+  { name: 'English', value: 'eng' },
+  { name: 'Spanish', value: 'spa' },
+]
+
+async function scan(file: string, lang: string): Promise<string> {
+  return await new Promise(async (resolve, reject) => {
+    try {
+      if (file.endsWith('.pdf') || file.startsWith('data:application/pdf')) {
+        const images = await PdfService.convertToImages({ file })
+        console.log({ images })
+        let text = ''
+        for (const image of images) {
+          text += await scanImage(image.base64, lang)
+        }
+
+        // const text = await PdfService.convertToText(file);
+        resolve(text)
+      } else {
+        // OCR
+        const text = await scanImage(file, lang)
+        resolve(text)
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e)
+      reject(e)
+    }
+  })
+}
+
+async function scanImage(file: string, lang: string): Promise<string> {
+  // eslint-disable-next-line no-console
+  console.log('[OCR] Scanning image: ', file, lang)
+  return await new Promise(async (resolve, reject) => {
+    let image = file
+    await Tesseract.recognize(image, lang, {
+      logger: (m) => {
+        // eslint-disable-next-line no-console
+        console.log('[OCR] Logger: ', JSON.stringify(m))
+      },
+    })
+      .then(({ data: { text } }) => {
+        // eslint-disable-next-line no-console
+        console.log('[OCR] Result: ', text)
+        resolve(text)
+      })
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.log('[OCR] Error: ', e)
+        reject(e)
+      })
+  })
+}
+
+export default {
+  scan,
+}
+```
+
+And call this function inside the **_“DocumentRoutes.Edit.View”_** component:
+
+```diff
++ import { useRef, useState } from "react";
++ import OcrTesseractService from "~/modules/ocr/OcrTesseractService";
++ import ActionResultModal from "~/components/ui/modals/ActionResultModal";
+
+export default function DocumentRoutesEditView() {
+  ...
++  const [scanningState, setScanningState] = useState<{ status: "idle" | "loading" | "error" | "success"; result?: string; error?: string }>();
++    async function onOcr() {
++      setScanningState({ status: "loading", result: undefined, error: undefined });
++      try {
++        const text = await OcrTesseractService.scan(data.item.document.file, "spa");
++        if (!text) {
++          setScanningState({ status: "error", error: "Unknown error" });
++        }
++        setScanningState({ status: "success", result: text });
++      } catch (e: any) {
++        setScanningState({ status: "error", error: e.message });
++      }
++    }
+  return (
+     ...
++         {appOrAdminData.isSuperAdmin && (
++           <ButtonSecondary onClick={onOcr} disabled={scanningState?.status === "loading"}>
++             <div className="text-xs">{scanningState?.status === "loading" ? "Scanning..." : "Scan"}</div>
++           </ButtonSecondary>
++         )}
+          <ButtonSecondary to="activity">
+            <ClockIcon className="h-4 w-4 text-gray-500" />
+          </ButtonSecondary>
+          ...
++         <ActionResultModal
++            actionResult={{
++              error: scanningState?.status === "error" ? { title: "Error", description: scanningState?.error ?? "" } : undefined,
++              success: scanningState?.status === "success" ? { title: "Success", description: scanningState?.result ?? "" } : undefined,
++            }}
++        />
+```
+
+And with those 3 file modifications (plus the tesseract.js installation), I have a working scanning feature:
+
+![git changes](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*w47zMLbJkxdvfxmJl59hjA.png)
+
+![PDF Scanned Result](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*zdHdGktgElYN1h79uTpSow.png)
+
+If you’re a SaasRock Enterprise subscriber, here’s the release for the current progress: [github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-ocr-with-tesseract.js](https://github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-ocr-with-tesseract.js).
+
+## 5. Using the Custom Calendar View
+
+Right now, the default Documents Index View is a table, but I want to use the _“Calendar View”_ I designed called **_“AccountDocuments.tsx”_**. I need to use the new DTOs _(**DocumentDto** and **DocumentTypeDto**)_ instead of the fake ones _(and delete them)_, so I can replace the table with the component:
+
+```diff
+...
+import AccountDocuments from "~/modules/documents/components/AccountDocuments";
+import { useAppData } from "~/utils/data/useAppData";
+import InputSearch from "~/components/ui/input/InputSearch";
+import InputSelect from "~/components/ui/input/InputSelect";
+
+export default function DocumentRoutesIndexView() {
+  const { t } = useTranslation();
++ const appData = useAppData();
+  ...
++ const [year, setYear] = useState(new Date().getFullYear());
++ const [searchInput, setSearchInput] = useState<string>("");
+  ...
++ function filteredTypes() {
++  return appData.documentTypes.filter(
++    (t) => t.name.toLowerCase().includes(searchInput.toLowerCase()) || t.description.toLowerCase().includes(searchInput.toLowerCase())
++  );
++ }
+  return (
+    ...
+-   <TableSimple ... />
++   <div className="flex space-x-2">
++      <div className="w-full">
++        <InputSearch value={searchInput} setValue={setSearchInput} />
++      </div>
++      <div className="w-32">
++        <InputSelect
++          value={year}
++          options={[
++            { name: "2023", value: 2023 },
++            { name: "2022", value: 2022 },
++          ]}
++          setValue={(e) => setYear(Number(e))}
++        />
++      </div>
++    </div>
+
++   <AccountDocuments year={year} types={filteredTypes()} documents={data.items} />
+      ...
+```
+
+And this will actually be functional:
+
+![Documents Index View](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Q4Af3zHJ5hPhAP0z8K7i2w.png)
+
+But I want some important improvements for great UX:
+
+- Clicking on a **_“missing document”_** cell should redirect to the /new route with typeId, year, and period on the query params. And if the _“Document.New.Api”_ should redirect to the calendar instead of redirecting to _“Document.Edit.View”_.
+- Clicking on a **_“valid document”_** cell should open the side modal overviewing the document.
+- **_“DocumentForm”_** should be interactive: if the selected -DocumentType is of type _“timesInYear = 12”_ the period selector should display all the months, but if _“timesInYear = 4”_ it should display _“Jan-Mar”, “Apr-Jun”_...
+- The **_“Document.New.Api”_** should throw an error if the uploaded document has already been uploaded.
+
+I won’t write the code diff for these improvements, but here are some images so you get the idea and the corresponding gist code:
+
+### AccountDocuments.tsx:
+
+Each cell now has an onClick handler, and based on the document status it will render the correct color when hovering. [Gist here](https://gist.github.com/AlexandroMtzG/ff159bc73f8ccbafac777c9fb114d89e).
+
+![AccountDocuments.tsx](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*zIXcAMHPXimytkMVQ-Jn9g.png)
+
+### DocumentRoutes.Index.View.tsx:
+
+Remove the default table and replace it with the **_“AccountDocuments.tsx”_** component. Also, I’m listing the possible years, instead of having to filter by typing the year. [Gist here](https://gist.github.com/AlexandroMtzG/cd15eecf5081f3d4ff38b70342710605).
+
+![DocumentRoutes.Index.View.tsx](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*51Is2iWsCtKepC4qMFXPgg.png)
+
+### DocumentForm.tsx:
+
+Now the form needs to be reactive. Whenever the document type is set, the Period selector should display the valid options. Also, if it’s creating a new Document, it will see if the query parameters are set, or fall back to default values. [Gist here](https://gist.github.com/AlexandroMtzG/2379ac2a52583612bb6d95862d25822e).
+
+![DocumentForm.tsx](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*etCE-FIA7R0_0ImKGMdj-g.png)
+
+### DocumentRoutes.New.Api.tsx:
+
+I should verify if the document has been created before, so I don’t have more than 1 document for the same tenantId, typeId, year, and period.
+
+![DocumentRoutes.New.Api.tsx](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*fHu3giYdTaBQ68Zmh1VOmg.png)
+
+## 6. Viewing my Linked Accounts Documents
+
+There are still 2 major problems now:
+
+- The current Documents Index Route lists all the current tenant’s documents as well as the linked account’s documents. That’s because I set the Documents entity’s default visibility to _“Linked Accounts”_, this automatically shares with every account linked. And the default **_“RowsApi.getAll()”_** function gets every row you have access to. I need to tell it to retrieve only a specific tenant’s documents.
+- I need to identify which tenant/account documents are we looking at. And if it’s not the current tenant’s documents, he could not upload _(hover to add -> disabled)_, only view.
+
+For this MVP, I can kill two birds with one stone by having a _Tenant/Account_ selector and showing the **_“AccountDocuments.tsx”_** calendar view with the selected Tenant _(if not set, display the current one)_.
+
+![Final Documents View](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*c5fmWWOQOCwFXeqFKoeQng.png)
+
+😮‍💨… the longest article so far!
+
+---
+
+## End Result
+
+If you’re a SaasRock Enterprise subscriber, you can download this code in this release: [github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-linked-account-selector-to-view-documents](https://github.com/AlexandroMtzG/saasrock-delega/releases/tag/part-4-documents-linked-account-selector-to-view-documents).
+
+---
+
+## What’s next?
+
+In chapter 5, I’ll start working on the **Pricing** model:
+
+- Plans and Prices
+- Creating the Plans in Stripe
+- Plan Limits
+
+...and more subscription-related stuff.
+
+Follow [me](https://twitter.com/AlexandroMtzG) & [SaasRock](https://twitter.com/saas_rock) or subscribe to [my newsletter](https://saasrock.com/newsletter) to stay tuned!

@@ -1,0 +1,173 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Create Compelling SaaS Marketing Pages: ChatGPT-Driven Copy with SaasRock — Part 6',
+  category: 'Article',
+  description: `Discover how to create compelling SaaS marketing pages using ChatGPT-driven design with SaasRock v0.8.3 so you can leverage AI technology to make your marketing pages more engaging and relevant for your audience.`,
+  date: '2023-04-04T16:37:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Discover how to create compelling SaaS marketing pages using ChatGPT-driven design with [SaasRock v0.8.3](https://saasrock.com/?ref=dev.to&utm_content=saasrock-delega-part-6) so you can leverage AI technology to make your marketing pages more engaging and relevant for your audience.
+
+Check out [part 5 here](https://alexandromtzg.medium.com/building-a-document-and-contract-saas-with-saasrock-part-5-pricing-plans-bd8888f56751).
+
+<img
+  src={image}
+  alt="Create Compelling SaaS Marketing Pages: ChatGPT-Driven Copy with SaasRock — Part 6"
+  className="w-full"
+/>
+
+<!--more-->
+
+## Chapter 6
+
+1. SEO Meta Tags
+2. Landing Page Blocks
+3. Generating the Landing Page with ChatGPT
+
+---
+
+## 1. SEO Meta Tags
+
+I first want to describe what my SaaS does using the _“app/modules/pageBlocks/utils/**defaultSeoMetaTags**.ts”_ meta tags: _title, description, keywords, image, thumbnail, twitterSite, and twitterCreator_.
+
+```diff
+export const siteTags: MetaTagsDto = {
+-  title: "SaasRock | The One-Man SaaS Framework",
+-  description:"Quick start your MVP with out-of-the-box SaaS features like Authentication, Pricing & Subscriptions, Admin & App portals, Entity Builder (CRUD, API, Webhooks, Permissions, Logs...), Blogging, CRM, Email Marketing, Page Block Builder, Notifications, Onboarding, and more.",
+-  keywords: "remix,saas,tailwindcss,prisma,react,typescript,boilerplate,saas-kit,saas-boilerplate,stripe,postmark,admin-portal,app-dashboard,multi-tenancy",
+-  image: "https://yahooder.sirv.com/saasfrontends/remix/ss/cover.png",
+-  thumbnail: "https://yahooder.sirv.com/saasfrontends/remix/thumbnail.png",
+-  twitterSite: "@saas_rock",
++  title: "Délega | Gestión de cumplimiento",
++  description: "Gestión de cumplimiento de proveedores especializados. Firma tus contratos y gestiona evidencia de documentación legal de proveedores como Opinión de Cumplimiento SAT, INFONAVIT, IMSS y documentación para REPSE .",
++  keywords: "administracion de proveedores, cumplimiento de proveedores, proveedores, proveedores de servicios, documentacion, gestion de documentos, firma de contratos, contrato digital, infonavit, imss, sat, repse, cumplimiento",
++  image: "https://yahooder.sirv.com/Delega/SEO/seo.png",
++  thumbnail: "https://yahooder.sirv.com/Delega/SEO/seo.png",
++  twitterSite: "@delega_app",
+twitterCreator: "@AlexandroMtzG",
+};
+```
+
+## 2. Landing Page Blocks
+
+SaasRock has a built-in page blocks builder, read more about this [here](https://javascript.plainenglish.io/building-a-page-block-builder-with-remix-and-tailwind-css-f9044a09cfa8) or watch the [demo video](https://www.loom.com/share/aabfac5c4fb94e2698e459fa4a01f948).
+
+The default landing page looks something like this:
+
+```ts
+export function defaultLandingPage({ t }: { t: TFunction }) {
+  const blocks: PageBlockDto[] = [
+    // Banner
+    {
+      banner: {
+        style: "top",
+        text: "SaasRock v0.8.2 🎉 + Entity Code Generator 🚀",
+        cta: [{ text: t("front.changelog.title"), href: "/changelog", isPrimary: true }],
+      },
+    },
+    // Header
+    {
+      header: defaultHeader,
+    },
+    // Hero
+    {
+      hero: {
+        style: "simple",
+        headline: t("front.hero.headline1"),
+        description: t("front.hero.headline2"),
+        image: "https://yahooder.sirv.com/saasrock/seo/admin-portal.png",
+        cta: [
+          {
+            text: t("front.hero.buy"),
+            href: "/pricing",
+            isPrimary: true,
+          },
+          {
+            text: t("front.hero.docs"),
+            href: "/docs",
+            isPrimary: false,
+          },
+        ],
+        topText: {
+          text: t("front.hero.subheadline1"),
+        },
+        bottomText: {
+          link: {
+            text: t("front.hero.hint"),
+            href: "/changelog",
+          },
+        },
+      },
+    },
+    ...
+```
+
+I have already implemented the following blocks:
+
+![Supported Blocks](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*8dlH9Wu7KkVDI9dGYpgPMA.png)
+
+I could update the _**“defaultLadingPage”**_ object manually, or...
+
+## 3. Generating the Landing Page with ChatGPT
+
+Having configured the meta tags, I can now toggle the “?editMode=true” on the landing page, and click on the ChatGPT icon to automatically generate the existing blocks. It will open up a modal to specify the context. See in the following image, the meta tags are automatically loaded.
+
+![ChatGPT parameters](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*NLnREtOqVXpF3WbAnXVq6g.png)
+
+I forgot to update the OpenAPI key env variable _(OPENAI_API_KEY)_. You can get yours here: https://platform.openai.com/account/api-keys.
+
+![Missing OpenAI API Key](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*H2dPahwi-lx5ryZ4BoPgew.png)
+
+After restarting the server so the .env variable loads, and about 30 seconds, I now have a fully functional landing page:
+
+![Generated Landing Page](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*sLeFT45abTCX6IGKCmK2OA.png)
+
+A few things about this generated landing page:
+
+- The landing page was generated in Spanish since my meta tags are in that language.
+- I can click on the top button **_“Download Blocks”_** and paste them into the **_“defaultLandingPage”_** block array.
+- I can add custom details before generating the blocks _(e.g. For the Food Industry)_.
+- About 70% of the time, it works. Sometimes the ChatGPT-3.5-turbo model returns content in an incorrect format and the block data cannot be parsed _(JSON format)_.
+- If I didn’t like a block, I could generate it again. Each block has its own ChatGPT icon. And I can inspect the response _(or ERROR)_ by clicking on it.
+
+![ChatGPT Response](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*HpEm1cDWARACCHtLhd1ySA.png)
+
+### Another example for the Features block.
+
+Parameters: _“SaaS for restaurants, 6 features, formal, innovative”_.
+
+![Prompt](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Lwoni9cb4H9e8iSJCPgTTQ.png)
+
+Result:
+
+![Features Block Example](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*3M446nVaVENWtdQ4tM4f3A.png)
+
+You can even generate full startup ideas with this 👀!!!
+
+---
+
+## End Result
+
+By utilizing **ChatGPT**-driven design with [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=saasrock-delega-part-6), you can create impressive SaaS marketing copy that matters to your target audience.
+
+There are even more exciting possibilities for the future of SaasRock and ChatGPT-driven design. A potential feature to be implemented in a future SaasRock release is a ChatGPT-Driven **variant generator**. This enhancement would not only generate the copy for your SaaS marketing pages but also create different variants for each element, such as a more captivating **Hero** design or a nicer **Features** list/grid.
+
+_*I used SaasRock v0.8.3, released on April 4th, 2023*_
+
+---
+
+## What’s next?
+
+In chapter 7, I’ll cover Migrating from SaasRock **Core to Enterprise**:
+
+- Switching to SaasRock **Enterprise**
+- Creating an **Onboarding** flow
+- Page view & Event **tracking**
+
+And more SaasRock Enterprise features.
+
+Follow [me](https://twitter.com/AlexandroMtzG) & [SaasRock](https://twitter.com/saas_rock) or subscribe to [my newsletter](https://saasrock.com/newsletter?ref=dev.to&utm_content=saasrock-delega-part-6) to stay tuned!

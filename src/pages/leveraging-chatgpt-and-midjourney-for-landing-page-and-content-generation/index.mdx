@@ -1,0 +1,108 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Leveraging ChatGPT and Midjourney for Landing Page and Content Generation',
+  category: 'Article',
+  description: `I’ve been experimenting with AI APIs and tools, and the journey has been both exciting and insightful. In this blog post, I’ll share my experiences working with ChatGPT and Midjourney for content and landing page generation, and discuss some potential use cases for these tools in SaasRock.`,
+  date: '2023-03-26T16:37:00.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+I’ve been experimenting with AI APIs and tools, and the journey has been both exciting and insightful. In this blog post, I’ll share my experiences working with ChatGPT and Midjourney for content and landing page generation, and discuss some potential use cases for these tools in [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=leveraging-chatgpt).
+
+<img
+  src={image}
+  alt="Leveraging ChatGPT and Midjourney for Landing Page and Content Generation"
+  className="w-full"
+/>
+
+<!--more-->
+
+## Content Generation using GPT and Midjourney
+
+My friend (and mentor) [Chris](https://twitter.com/ckluis), shared his idea of a simple Prompt Builder. We believed it could be turned into an MVP with just 2–3 days of work.
+
+Try the MVP: [remix-openai.vercel.app](https://remix-openai.vercel.app).
+
+⚠️ If you’re a [SaasRock](https://saasrock.com/) Enterprise subscriber you can get access to this repo, just [DM me](https://discord.gg/KMkjU2BFn9) your GitHub username to invite you. ⚠️
+
+The premise of the tool is simple: the user enters a topic, and the GPT-based tool generates a list of ideas in various formats such as blog post outlines, song lyrics, or TikTok video ideas. Each piece of content would contain **ContentType**, **Title**, **Description**, **Keywords**, **Audience**, **Tone**, an **Image Prompt** _(to use in AI image generators)_, and the **Outline**.
+
+For example, if I set “Building a Landing Page and Content generator using GPT with Remix and Tailwind CSS” as the topic, it will take about 90 seconds:
+
+![Ideas by GPT](https://miro.medium.com/v2/resize:fit:720/format:webp/1*du6mHejKWCy91eZuP-iC9A.png)
+
+In this case, it gave me 3 pieces of content:
+
+1. **Landing Page Copy** — Creating a Tailwind CSS Landing Page with GPT-4 Generated Content
+2. **Blog Post** — How GPT-4 and Tailwind CSS Can Revolutionize Your Content Strategy
+3. **Email Newsletter** — Boost Your E-commerce Sales with GPT-4 Generated Product Descriptions
+
+I use DALL-E to generate images, but they’re meh, I’m waiting for a public [Midjourney](https://midjourney.com/) API, it’s only available from discord from now, I’ll prompt the second idea with the “IMAGE PROMPT” result.
+
+![AI-generated blog post cover](https://miro.medium.com/v2/resize:fit:720/format:webp/1*0jqsKDgvdpijErv-RUXIMw.png)
+
+I upscaled the first result as the image cover for this blog post:
+
+![AI-generated blog post cover](https://miro.medium.com/v2/resize:fit:720/format:webp/1*Iv5AN_oroaLCVuKcM2TcoQ.png)
+
+---
+
+## Landing Page Generation with Remix Page Blocks
+
+Then, I thought I should leverage my existing open-source page block builder, [Remix Page Blocks](https://remix-page-blocks.vercel.app/), to try telling GPT to generate a complete landing page based on a prompt.
+
+The page builder works from “PageBlocks”:
+
+![Remix Page Blocks](https://miro.medium.com/v2/resize:fit:720/format:webp/1*Mx4G8tyoUm6pv5tiakfT6g.png)
+
+So it would be enough to give ChatGPT a bit of context about each supported block and some examples ([here’s the full prompt](https://gist.github.com/AlexandroMtzG/dd66e7e53f88663722bab24dbc17b4b8)):
+
+![Response](https://miro.medium.com/v2/resize:fit:720/format:webp/1*SokoiWRuqmyn9diYzviSVg.png)
+
+The AI-generated response was impressive, and I was able to use the generated blocks in the demo to create a landing page with some iterations.
+
+![AI-generated Landing Page](https://miro.medium.com/v2/resize:fit:720/format:webp/1*cAhd_KKMx4zQBSh8UVX3KA.png)
+
+I just have to copy and paste these blocks into the demo:
+
+![Blocks](https://miro.medium.com/v2/resize:fit:720/format:webp/1*wtqewcRVUy0PEmEI9MNvog.png)
+
+And iterate upon that 😳.
+
+![AI-generated content](https://miro.medium.com/v2/resize:fit:720/format:webp/1*b3rMzIhJs69h0Ca2kuBcnQ.png)
+
+The next step would be to give ChatGPT more context so it understands the structure of each block so it could create multiple reusable HeroBlocks FeaturesBlocks, PricingBlocks, etc… Or generate images with DALL-E to use in a GalleryBlock.
+
+---
+
+## Challenges Encountered
+
+### Vercel Timeout Calling ChatGPT
+
+The API can take a while if your prompt is complex, and since I use [Remix](https://remix.run/) hosted on [Vercel](https://vercel.com/), I often reach the 60-second limit on the Pro plan. Luckily, this can be fixed by using Vercel’s Edge Functions with streaming ([read more](https://vercel.com/blog/gpt-3-app-next-js-vercel-edge-functions)).
+
+### Midjourney generates weird letters and words
+
+I’ve been trying Midjourney to try getting better results, but sometimes you cannot escape its weirdness.
+
+![Midjourney’s weirdness](https://miro.medium.com/v2/resize:fit:640/format:webp/1*fuMILaTMiKIVc1ukZOQw3w.png)
+
+---
+
+## Incorporating ChatGPT into SaasRock
+
+Some brainstorming on how I could add ChatGPT to **SaasRock**:
+
+- Blog Post Generator
+- Landing Page Generator/Iterator
+- Documentation & FAQ Generator
+- Email Campaign Generator
+- Data Analyzer (MRR, MAU…)
+- Integrated CRUD File Generator
+
+Just imagine SaasRock v2, a website with a simple prompt input that autogenerates your SaaS in one click.
+
+Follow [me](https://twitter.com/AlexandroMtzG) & [SaasRock](https://twitter.com/saas_rock) or subscribe to my [newsletter](https://saasrock.com/newsletter?ref=dev.to&utm_content=leveraging-chatgpt) to stay tuned!

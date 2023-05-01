@@ -15,6 +15,7 @@
     "@tailwindcss/typography": "^0.1.2",
     "@tailwindcss/ui": "^0.3.0",
     "autoprefixer": "^9.8.4",
+    "fs": "^0.0.1-security",
     "next": "9.4.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",

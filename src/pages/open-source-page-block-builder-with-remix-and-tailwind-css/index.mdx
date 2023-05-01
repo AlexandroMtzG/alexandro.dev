@@ -1,0 +1,80 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'Open-source Page Block Builder with Remix and Tailwind CSS',
+  category: 'Article',
+  description: `Remix Page Block Editor, Contact and Newsletter Pages, and Theme and Locale selectors.`,
+  date: '2022-11-25T16:32:34.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+Remix Page Block Editor, Contact and Newsletter Pages, and Theme and Locale selectors.
+
+Code: https://github.com/AlexandroMtzG/remix-page-blocks
+
+Demo: https://remix-page-blocks.vercel.app
+
+<img
+  src={image}
+  alt="Open-source Page Block Builder with Remix and Tailwind CSS"
+  className="w-full"
+/>
+
+<!--more-->
+
+## Context
+
+I’ve been a SaaS builder for 3 years now, ever since I learned Tailwind CSS, my design iterations have been a joy.
+
+But [Remix](https://remix.run/) completely changed the game for me, being an SSR-focused framework plus providing [full stack components](https://www.youtube.com/watch?v=RszUDp_yiLI), it allowed me to iterate SaaS development even faster.
+
+## Page Blocks
+
+I’ve already designed the same Hero Block a few times:
+
+- [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=remix-page-blocks)
+- [Factura.so](https://factura.so/?ref=dev.to&utm_content=remix-page-blocks) (built with saasrock)
+- [Gumcrm.io](https://gumcrm.io/?ref=dev.to&utm_content=remix-page-blocks) (built with saasrock)
+- [NetcoreSaas](https://netcoresaas.com/?ref=dev.to&utm_content=remix-page-blocks)
+- [SaasFrontends](https://saasfrontends.com/?ref=dev.to&utm_content=remix-page-blocks)
+- [Delega.com.mx](https://delega.com.mx/?ref=dev.to&utm_content=remix-page-blocks) (built with netcoresaas)
+
+![Same Hero Block](https://miro.medium.com/max/1400/1*rfAh4Jh1iI5VpPnaZ6cqwQ.png)
+
+They all have the same structure:
+
+- Headline
+- Subheadline
+- CTA buttons (primary or secondary)
+- An optional top text/link
+- An optional bottom text/link
+
+You can understand how this becomes tiring, even with months between each SaaS app development, so it makes sense for me to start abstracting the most common components into a Page Builder.
+
+![HeroBlockDto](https://miro.medium.com/max/1400/1*DOU1EkYik4gHev-nJW-6NQ.png)
+
+## Developer Experience
+
+I always focus on great DX first, so this approach lets you design the Landing page blocks by code, and once it’s in production, it’d let you make changes to your blocks by persisting changes in the database (with Prisma).
+
+Here’s how the Hero block looks:
+
+![Hero Block by Code](https://miro.medium.com/max/1400/1*4cu-CswtA2ufXfEWUnR19g.png)
+
+And here’s what the Hero Block editor looks like:
+
+![Hero Block Editor](https://miro.medium.com/max/1400/1*Cz6eBmpoq0YW0-mJopnAQA.png)
+
+## Open Source
+
+I decided to make this bit open source to help other Remix developers iterate faster, or at least provide them a simple page builder, [give it a star](https://github.com/AlexandroMtzG/remix-page-blocks). I can see someone building a full website builder with this project as the base. If you want to check out my other open-source projects, check out my [GitHub profile](https://github.com/AlexandroMtzG).
+
+## SaasRock
+
+If you like what I do, check out my commercial SaaS boilerplate, [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=remix-page-blocks), or watch how I’m using this Page Block builder here: https://www.loom.com/share/eccf927d35cd4ad3b4a1d512257cea53.
+
+---
+
+Thanks for reading 😃.

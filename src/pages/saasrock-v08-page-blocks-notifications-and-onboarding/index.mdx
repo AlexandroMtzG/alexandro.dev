@@ -1,0 +1,130 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'SaasRock v0.8 - Page Blocks, Notifications, and Onboarding',
+  category: 'Article',
+  description: `Introducing SaasRock v0.8 with a Page Block builder, Notifications using Novu, and a built-in Onboarding builder`,
+  date: '2022-12-09T03:07:02.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+I'm excited to announce the release of [SaasRock v0.8](https://saasrock.com/?ref=dev.to&utm_content=v0-8-release), which introduces several powerful new features, including a **Page Block** builder, **Notifications** using [Novu](https://novu.co/?ref=saasrock.com), and a built-in **Onboarding** builder.
+
+<img
+  src={image}
+  alt="SaasRock v0.8 - Page Blocks, Notifications, and Onboarding"
+  className="w-full"
+/>
+
+<!--more-->
+
+## 1/3 - Page Blocks
+
+Page blocks allow you to easily customize the design of the front pages _(Landing, Pricing, Blog, Blog Post, Contact, Newsletter, Changelog…)_.
+
+I made an [open-source](https://remix-page-blocks.vercel.app/) version of this, but with [SaasRock](https://saasrock.com/?ref=dev.to&utm_content=v0-8-release) it's 10x more powerful.
+
+Watch video demo here: https://www.loom.com/share/aabfac5c4fb94e2698e459fa4a01f948
+
+### Edit Mode
+
+If `?editMode=true` is set, you can iterate with your landing page design. Once you're happy you can **Download Blocks** and override it on the _app/modules/pageBlocks/utils/defaultPages/**defaultLandingPage.ts**_ file.
+
+![Edit Mode](https://cdn-images-1.medium.com/max/1600/1*ixnpapfs01BVI2SAD9hMMw.png)
+
+### Block Form
+
+Each block has its own Form, where you basically have:
+
+- **Style**: The variant _(e.g. HeroVariantSimple, HeroVariantTopImage…)_
+- **Copy**: Headline, subheadline, links…
+- **Items**: If the component requires a list of items _(e.g. Features, Community Members…)_
+
+![Hero Block Form](https://cdn-images-1.medium.com/max/1600/1*OX9W1mSrfT8IwThpzk0SIA.png)
+
+To create custom blocks, watch the following video: https://www.loom.com/share/24d744b78f1848f7aa3f4191b55974d4
+
+## 2/3 - Notifications
+
+[SaasRock v0.8](https://saasrock.com/?ref=dev.to&utm_content=v0-8-release) also introduces the ability to send in-app notifications to users using [Novu](https://novu.co/?ref=saasrock.com), an open-source notification infrastructure. Novu integrates with several providers, including **Twilio**, **Slack**, **Mailgun**, and **Postmark**.
+
+Watch video demo here: https://www.loom.com/share/8ffc0a8c2b594923a117d8306263e17c
+
+### Default Channels
+
+I've created a few channels that listen to some events by default _(🚀 = Enterprise-only)_:
+
+- **admin-accounts**: _created_
+- **admin-users**: _updated_
+- **admin-subscriptions**: _created, canceled_
+- **admin-api-keys**: _🚀 created, updated, deleted_
+- **admin-emails**: _🚀 received_
+- **admin-groups**: _🚀 created, updated, deleted_
+- **admin-linked-accounts**: _🚀 created, accepted, rejected, deleted_
+- **admin-account-members**: _🚀 invited, accepted, updated, deleted_
+- **admin-onboarding**: _🚀 started, dismissed, completed_
+- **admin-rows**: _🚀 created, updated, deleted, workflow.transition_
+- **roles**: _assigned_
+- **my-rows**: _Send notifications to row creators: comment, workflow, update_
+
+To create custom notifications, watch the following video: https://www.loom.com/share/4feae0449d4d4bae814c4fb22f0da6db
+
+## 3/3 - Onboarding
+
+Create a tour for your users with custom filters & steps _(Enterprise-only 🚀)_.
+
+Watch video demo here: https://www.loom.com/share/8acb58a663a8472d91d8a9b22c190c8e
+
+### Filters
+
+In the filters section, we can specify which users should see the onboarding. This is useful if we only want to show the onboarding to certain users, such as admin users or users in a specific role.
+
+- **admin.portal**: _/admin users_
+- **user.is**: _Specific user_
+- **user.language**: _Users with a specific language_
+- **user.roles.contains**: _Users with a specific role_
+- **user.roles.notContains**: _Users with a specific role_
+- **tenant.portal**: _/app users_
+- **tenant.is**: _Specific tenant_
+- **tenant.subscription.products.has**: _Has a specific subscription product_
+- **tenant.subscription.active**: _Has an active subscription_
+- **tenant.subscription.inactive**: _Has an inactive subscription_
+- **tenant.api.used**: _Has used the API_
+- **tenant.api.notUsed**: _Has not used the API_
+- **tenant.user.entity.hasCreated**: _Has created a specific entity_
+- **tenant.user.entity.hasNotCreated**: _Has not created a specific entity_
+
+### Steps
+
+Onboarding steps can have 1 or more:
+
+- **Links**: _Primary_ or _secondary_ actions that are tracked
+- **Gallery items**: _Images_ or embedded _Videos_
+- **Input field**: Ask your user to fill fields _(text/select, required/not required)_
+
+![Onboarding Steps Sample](https://cdn-images-1.medium.com/max/1600/1*of5iOsVmjAG2HzJNz4hr7g.png)
+
+## Additional changes
+
+- Stripe **Coupons** are now supported at /pricing
+- **MRR** indicator
+- **User** language is saved on the database
+- Other bug fixes
+
+---
+
+## Wrapping up
+
+In conclusion, SaasRock is slowly becoming a true SaaS-building framework.
+
+- The **[Page Block](https://saasrock.com/docs/features/page-blocks?ref=dev.to&utm_content=v0-8-release)** builder allows for easy customization,
+- **[Notifications](https://saasrock.com/docs/features/notifications?ref=dev.to&utm_content=v0-8-release)** bring a collaborative experience to your app,
+- and the **[Onboarding](https://saasrock.com/docs/features/onboarding?ref=dev.to&utm_content=v0-8-release)** builder makes it simple to create a personalized end-user experience.
+
+[Let me know](https://twitter.com/AlexandroMtzG) what you'd like to see in v0.9!
+
+---
+
+_This blog post was mostly generated with [ChatGPT](https://chat.openai.com/)_

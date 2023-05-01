@@ -205,7 +205,7 @@ export default function Home({ url }) {
                       <Component />
                     </div>
                   </div>
-                  <div className="text-base leading-6 font-normal">
+                  {/* <div className="text-base leading-6 font-normal">
                     <Link href={link}>
                       <a
                         className="text-gray-500 hover:text-gray-800"
@@ -214,7 +214,7 @@ export default function Home({ url }) {
                         Read more &rarr;
                       </a>
                     </Link>
-                  </div>
+                  </div> */}
                 </div>
               </article>
             </li>

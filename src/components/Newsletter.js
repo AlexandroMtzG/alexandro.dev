@@ -40,7 +40,7 @@ export default function Newsletter({ url }) {
         <div className="lg:w-0 lg:flex-1">
           {/* <h2 className="text-lg font-extrabold text-gray-900">Get notified</h2> */}
           <p className="text-lg leading-7 text-gray-500 mt-3">
-            I'm Alex 👋, currently building{' '}
+            I'm Alex 👋, building{' '}
             {/* <button
               onClick={next}
               // target="_blank"
