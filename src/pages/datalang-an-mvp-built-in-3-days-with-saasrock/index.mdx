@@ -1,0 +1,76 @@
+import { alexandromtzg } from '@/authors'
+import image from './card.png'
+
+export const meta = {
+  title: 'DataLang - an MVP built in 3 days with SaasRock',
+  category: 'Article',
+  description: `DataLang, an MVP built this week on top of SaasRock v0.8.8.`,
+  date: '2023-06-15T12:40:37.000Z',
+  authors: [alexandromtzg],
+  image,
+}
+
+DataLang, an MVP built this week on top of SaasRock v0.8.8.
+
+<img
+  src={image}
+  class="shadow-2xl border border-gray-100 rounded-lg"
+  alt="DataLang - an MVP built in 3 days with SaasRock"
+  className="w-full"
+/>
+
+<!--more-->
+
+[​DataLang​](https://datalang.io/?ref=saasrock.com&utm_content=introducing-datalang), an MVP built this week on top of SaasRock v0.8.8.
+
+Idea: You ask something in natural language, and your database answers you in natural language.
+
+Try the [​demo here​](https://datalang.io/demo?ref=saasrock.com&utm_content=introducing-datalang) or watch the [​video here​](https://www.loom.com/share/1e28c89ed4b54085bdaa848bfd3f782e?sid=86b269ec-7956-4800-9228-4a3f3f902a41).
+
+I want to achieve multiple things with this MVP:
+
+1. Keep building real-world apps with SaasRock to improve it on the fly
+2. Keep launching micro-SaaS apps to test the market
+3. Use GPT in a real-world use case
+4. Market SaasRock
+
+---
+
+## What Can DataLang Do?
+
+DataLang is designed to make database interaction intuitive and user-friendly. Here's how it works:
+
+1. You set up your data source **connection string**.
+2. DataLang fetches all the **schema tables** and columns from your data source.
+3. **You ask a question** in natural language, such as _"How many users signed up this month?"_
+4. DataLang sends your question to **GPT** _(OpenAI)_.
+5. GPT processes your question and generates an **SQL query**.
+6. The **SQL query executes** in your database.
+7. A **natural language response** is returned.
+
+## Security Measures
+
+### Credential Encryption
+
+I understand the importance of data security. That's why your data source credentials are encrypted before being stored in the DataLang database, and only decrypted before executing SQL. I use [this method](https://gist.github.com/AlexandroMtzG/9e0ebd0751f49e3f6d8b1eac3651195b) to encrypt/decrypt credentials.
+
+### Dangerous SQL Statements Prevention
+
+My prompt engineering method uses 4 prompts:
+
+1. Understanding the end-user question
+2. Interpreting the DB schema + making sense of the question
+3. Crafting SQL statements (SELECT only)
+4. Final SQL safety check
+
+In the 4 steps, the prompts make sure to throw an **"Unsafe question"** error if it identifies dangerous operations, such as INSERT, UPDATE, DELETE, ALTER, DROP...
+
+## API
+
+Use your account API Keys to send questions in the following format:
+
+![Send a POST request to the Questions API](https://yahooder.sirv.com/datalang/features/api-request.png)
+
+---
+
+Read the full DataLang [​blog post here​](https://datalang.io/blog/introducing-datalang-ask-questions-to-your-database-in-natural-language?ref=saasrock.com&utm_content=introducing-datalang).
