@@ -1,5 +1,5 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/63ad9e4d-0c03-4f57-a9c2-35e708f08d63/deploy-status)](https://app.netlify.com/sites/elegant-ritchie-ea1567/deploys)
-
 ## alexandro.dev
 
 My personal blog
+
+<img width="621" alt="alexandro.dev" src="https://user-images.githubusercontent.com/8606530/235551510-8c0dcf7b-d3bc-47a5-8722-7d63f5dd42d1.png">
